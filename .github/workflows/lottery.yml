@@ -1,0 +1,10 @@
+name: Reviewer lottery
+  # You may pin to the exact commit or the version.
+  # uses: uesteibar/reviewer-lottery@c291d74388da1cb583aff994b8be945e8eefbcd5
+  uses: uesteibar/reviewer-lottery@v3.1.0
+  with:
+    # Github token secret
+    repo-token: ${{ secrets.GITHUB_TOKEN }}
+    # Path to config file
+    config: # optional, default is .github/reviewer-lottery.yml
+            
