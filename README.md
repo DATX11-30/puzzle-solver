@@ -5,13 +5,13 @@ A bachelor thesis project at Chalmers University of Technology
 ## Git Good,
 
 A guide for nice git-behaviour
-Branch naming convention:
+###Branch naming convention:
 
 - All lower case and spaces using -
 - feature/{issue name}
   - eg. /feature/sudoku-parser
 
-## Pull request ethics:
+### Pull request ethics:
 
 - Rebase on main and test before PR
 - Describe what your PR solves and what feature it implements/alternatively link it to a task or issue
