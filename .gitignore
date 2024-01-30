@@ -1,1 +1,4 @@
 .ghc.environment*
+*.o
+*.hi
+.DS_STORE
