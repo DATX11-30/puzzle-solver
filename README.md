@@ -2,10 +2,9 @@
 
 A bachelor thesis project at Chalmers University of Technology
 
-## Git Good,
+## Git Good: A guide for nice git-behaviour
 
-A guide for nice git-behaviour
-###Branch naming convention:
+### Branch naming convention:
 
 - All lower case and spaces using -
 - feature/{issue name}
