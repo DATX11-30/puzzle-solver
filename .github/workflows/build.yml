@@ -1,15 +1,13 @@
-name: "build-test"
+name: "Reviewer lottery"
 on:
-  pull_request:
-  push:
-    branches:
-      - master
+  pull_request_target:
+    types: [opened, ready_for_review, reopened]
 
 jobs:
-  build: # make sure build/ci work properly
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - run: |
-          npm install
-          npm run all
+      - uses: uesteibar/reviewer-lottery@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
