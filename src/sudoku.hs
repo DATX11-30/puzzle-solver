@@ -1,10 +1,17 @@
 module Sudoku where
 
--- | A representation of the values in a sudoku from 0-9
-data Value
+-- | A representation of the values in a sudoku from 0-9 TODO: SHOULD BE RENAMED!!!!!
+data SudVal = One | Two -- ... 
 
+data Value
+    = Filled SudVal 
+    | Note [SudVal]
+    | Empty
+    
 -- | A representation of a sudoku
-data Sudoku
+type Sudoku = [[Value]]
+
+
 
 -- | a position in a soduku
 type Position = (Int, Int)
