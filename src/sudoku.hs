@@ -11,8 +11,6 @@ data Value
 -- | A representation of a sudoku
 type Sudoku = [[Value]]
 
-
-
 -- | a position in a soduku
 type Position = (Int, Int)
 
