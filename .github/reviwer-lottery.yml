@@ -1,0 +1,8 @@
+groups:
+  - name: devs
+    reviewers: 1
+    usernames:
+      - Krysset
+      - MHultin
+      - vicebb
+      - CurryNRice
