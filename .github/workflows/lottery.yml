@@ -6,5 +6,5 @@ name: Reviewer lottery
     # Github token secret
     repo-token: ${{ secrets.GITHUB_TOKEN }}
     # Path to config file
-    # config: # optional, default is .github/reviewer-lottery.yml
+    config: ./.github/reviewer-lottery.yml # optional, default is .github/reviewer-lottery.yml
             
