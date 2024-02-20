@@ -70,16 +70,15 @@ fillCell sud (row, col) v = take row sud ++ [changeAtIndex (sud !! row) col v] +
         changeAtIndex :: [a] -> Int -> a -> [a]
         changeAtIndex (x:xs) p v | p == 0 = v:xs
                          | otherwise = x : changeAtIndex xs (p-1) v
---fillCell (r:rs) (row, col) v | row == 0 = changeAtIndex r col v : rs 
---                             | otherwise = r : fillCell rs (row-1, col) v
 
+-- | Property for fillCell, checks if cell filled with its original value is the same as the original sudoku
 prop_fillCell :: Sudoku -> Position -> Bool
 prop_fillCell sud (row, col) = fillCell sud (row,col) (sud !! row !! col) == sud
 
+-- | Property for fillCell, checks if sudoku with cell filled with a value has that value at the correct position
 prop_fillCell2 :: Sudoku -> Position -> Value -> Bool
 prop_fillCell2 sud (row, col) v = fillCell sud (row,col) v !! row !! col == v
         
-
 
 -- | Returns the value at the given position
 valFromPos :: Sudoku -> (Int, Int) -> Value
@@ -97,6 +96,7 @@ columns = transpose
 blocks :: Sudoku ->  [Block]
 blocks sud = [[valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,6]] 
 
+-- | This is for seeing whether the blocks works correctly. It is not very constructive..
 prop_blocks :: Bool
 prop_blocks = blocks emptySudoku == replicate 9 (replicate 9 Empty) && blocks illegalSudoku == [[Filled x | _ <- [1..9]] | x <- [One ..]]
 
@@ -119,6 +119,8 @@ blockFromPos sud (row, col) = [valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0.
 sectionsFromPos :: Sudoku -> Position -> [Section]
 sectionsFromPos sud pos = [rowFromPos sud pos, colFromPos sud pos, blockFromPos sud pos]
 
+-- | Show a soduku in a more readable way. 
+-- | for correct formating do not forget putStrLn before calling this function
 showSudoku :: Sudoku -> String
 showSudoku [] = ""
 showSudoku (r1:r2:r3:rs) = showR r1 ++ "\n" ++ showR r2  ++ "\n" ++  showR r3 ++ "\n" ++ "-----------------------" ++ "\n" ++ showSudoku rs
