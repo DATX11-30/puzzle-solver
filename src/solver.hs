@@ -19,11 +19,11 @@ steps :: [Position -> Step]
 steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, LastRemainingCell, BlockedByRow]
 
 solve :: Sudoku -> Sudoku
-solve sud = applySoulutuin sud (generateSoulution sud)
+solve sud = applySolution sud (generateSoulution sud)
 
 -- | A solver for sudoku
-applySoulutuin :: Sudoku -> Soulution -> Sudoku
-applySoulutuin = foldl placeValueFromStep
+applySolution :: Sudoku -> Soulution -> Sudoku
+applySolution = foldl placeValueFromStep
 
 -- | Generates a soulution
 generateSoulution :: Sudoku -> Soulution
