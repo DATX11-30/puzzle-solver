@@ -1,7 +1,6 @@
 module SudokuLogic where
 
 import Sudoku
-import GHC.Arr (fill)
 
 type Lemma = Sudoku -> Position -> Bool
 
