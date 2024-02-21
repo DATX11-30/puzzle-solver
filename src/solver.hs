@@ -13,23 +13,23 @@ data Step = LastFreeCellBlock Position |
             NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
 
-type Soulution = [Step]
+type Solution = [Step]
 
 steps :: [Position -> Step]
 steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, LastRemainingCell, BlockedByRow]
 
 solve :: Sudoku -> Sudoku
-solve sud = applySolution sud (generateSoulution sud)
+solve sud = applySolution sud (generateSolution sud)
 
 -- | A solver for sudoku
-applySolution :: Sudoku -> Soulution -> Sudoku
+applySolution :: Sudoku -> Solution -> Sudoku
 applySolution = foldl placeValueFromStep
 
--- | Generates a soulution
-generateSoulution :: Sudoku -> Soulution
-generateSoulution sud = case next of
+-- | Generates a Solution
+generateSolution :: Sudoku -> Solution
+generateSolution sud = case next of
                             NOAVAILABLESTEPS -> []
-                            _ -> next : generateSoulution (placeValueFromStep sud next)
+                            _ -> next : generateSolution (placeValueFromStep sud next)
     where
         next = nextStep sud steps
 
