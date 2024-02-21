@@ -46,22 +46,7 @@ type Column =  Section
 -- | A block is a collection of 9 Values sorted from top left to bottom right
 type Block =  Section
 
--- | An empty soduku
-emptySudoku :: Sudoku
-emptySudoku = replicate 9 (replicate 9 Empty)
 
--- | An illegal sudoku for testing purposes
-illegalSudoku :: Sudoku
-illegalSudoku = [[Filled One, Filled One, Filled One, Filled Two, Filled Two, Filled Two, Filled Three, Filled Three, Filled Three],
-                 [Filled One, Filled One, Filled One, Filled Two, Filled Two, Filled Two, Filled Three, Filled Three, Filled Three],
-                 [Filled One, Filled One, Filled One, Filled Two, Filled Two, Filled Two, Filled Three, Filled Three, Filled Three],
-                 [Filled Four, Filled Four, Filled Four, Filled Five, Filled Five, Filled Five, Filled Six, Filled Six, Filled Six],
-                 [Filled Four, Filled Four, Filled Four, Filled Five, Filled Five, Filled Five, Filled Six, Filled Six, Filled Six],
-                 [Filled Four, Filled Four, Filled Four, Filled Five, Filled Five, Filled Five, Filled Six, Filled Six, Filled Six],
-                 [Filled Seven, Filled Seven, Filled Seven, Filled Eight, Filled Eight, Filled Eight, Filled Nine, Filled Nine, Filled Nine],
-                 [Filled Seven, Filled Seven, Filled Seven, Filled Eight, Filled Eight, Filled Eight, Filled Nine, Filled Nine, Filled Nine],
-                 [Filled Seven, Filled Seven, Filled Seven, Filled Eight, Filled Eight, Filled Eight, Filled Nine, Filled Nine, Filled Nine]
-                ]
 
 -- | Fills a cell with a value
 fillCell :: Sudoku -> Position -> Value -> Sudoku
@@ -96,10 +81,6 @@ columns = transpose
 blocks :: Sudoku ->  [Block]
 blocks sud = [[valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,6]] 
 
--- | This is for seeing whether the blocks works correctly. It is not very constructive..
-prop_blocks :: Bool
-prop_blocks = blocks emptySudoku == replicate 9 (replicate 9 Empty) && blocks illegalSudoku == [[Filled x | _ <- [1..9]] | x <- [One ..]]
-
 -- | Get the row that this position is included in
 rowFromPos :: Sudoku -> Position -> Row
 rowFromPos sud (row, col) = sud !! row
@@ -129,3 +110,6 @@ showSudoku (r1:r2:r3:rs) = showR r1 ++ "\n" ++ showR r2  ++ "\n" ++  showR r3 ++
                 showR (x1:x2:x3:xs) = "||" ++ show x1 ++ " " ++ show x2 ++ " " ++ show x3 ++ showR xs
 
 
+isFilled :: Value -> Bool
+isFilled (Filled _) = True
+isFilled _ = False

@@ -1,6 +1,7 @@
 module SudokuLogic where
 
 import Sudoku
+import Sudokus
 import GHC.Arr (fill)
 
 type Lemma = Sudoku -> Position -> Bool
@@ -40,9 +41,7 @@ testSud = illegalSudoku
 oneCellInSection :: Sudoku -> [Value] -> Bool
 oneCellInSection s vs = length (filter isFilled vs) == 8 
 
-isFilled :: Value -> Bool
-isFilled (Filled _) = True
-isFilled _ = False
+
 
 
 
