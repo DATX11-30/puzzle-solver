@@ -10,7 +10,7 @@ data Step = LastFreeCellBlock Position |
             LastFreeCellCollumn Position |
             LastRemainingCell Position |
             BlockedByRow Position      |
-            NOAVALIBLESTEPS
+            NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
 
 type Soulution = [Step]
@@ -28,7 +28,7 @@ applySoulutuin = foldl placeValueFromStep
 -- | Generates a soulution
 generateSoulution :: Sudoku -> Soulution
 generateSoulution sud = case next of
-                            NOAVALIBLESTEPS -> []
+                            NOAVAILABLESTEPS -> []
                             _ -> next : generateSoulution (placeValueFromStep sud next)
     where
         next = nextStep sud steps
@@ -58,9 +58,9 @@ valueFromLFCSection sec = case list' of
 
 -- | next step in solving the sudoku
 nextStep :: Sudoku -> [Position -> Step] -> Step
-nextStep sud [] = NOAVALIBLESTEPS
+nextStep sud [] = NOAVAILABLESTEPS
 nextStep sud (sf:sfs) = case tryStepsOnEmpty sud sf of
-                            NOAVALIBLESTEPS -> nextStep sud sfs
+                            NOAVAILABLESTEPS -> nextStep sud sfs
                             x -> x
 
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
@@ -73,7 +73,7 @@ emptyPositions sud = [(r,c) | r <- [0..8], c <- [0..8], not (isFilled (valFromPo
 
 -- | Tries to apply a lemma/step to all position, 
 tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Step
-tryStepOnPositions sud _ [] = NOAVALIBLESTEPS
+tryStepOnPositions sud _ [] = NOAVAILABLESTEPS
 tryStepOnPositions sud sf (p:ps) | testStep sud (sf p) = sf p
                                  | otherwise = tryStepOnPositions sud sf ps
 
