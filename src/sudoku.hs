@@ -96,6 +96,19 @@ blockFromPos sud (row, col) = [valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0.
         r = (row `div` 3) * 3
         c = (col `div` 3) * 3
 
+rowPositions :: Position -> [Position]
+rowPositions (row, col) = [(row, c) | c <- [0..8]]
+
+colPositions :: Position -> [Position]
+colPositions (row, col) = [(r, col) | r <- [0..8]]
+
+blockPositions :: Position -> [Position]
+blockPositions (row, col) = [(r+i,c+j) |  i <- [0..2], j <- [0..2]]
+    where
+        r = (row `div` 3) * 3
+        c = (col `div` 3) * 3
+
+
 -- | Gets the row, column and block associated with the position. 
 sectionsFromPos :: Sudoku -> Position -> [Section]
 sectionsFromPos sud pos = [rowFromPos sud pos, colFromPos sud pos, blockFromPos sud pos]

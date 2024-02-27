@@ -9,6 +9,9 @@ data Step = LastFreeCellBlock Position |
             LastFreeCellRow Position |
             LastFreeCellCollumn Position |
             SingleCandidate Position |
+            SinglePositionRow Position |
+            SinglePositionColumn Position |
+            SinglePositionBlock Position |
             BlockedByRow Position      |
             NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
@@ -16,7 +19,7 @@ data Step = LastFreeCellBlock Position |
 type Solution = [Step]
 
 steps :: [Position -> Step]
-steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, SingleCandidate]
+steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, SingleCandidate, SinglePositionRow, SinglePositionColumn, SinglePositionBlock]
 
 solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (generateSolution sud)
@@ -38,7 +41,25 @@ placeValueFromStep sud (LastFreeCellBlock p) = fillCell sud p (valueFromLFCB sud
 placeValueFromStep sud (LastFreeCellRow p) = fillCell sud p (valueFromLFCR sud p)
 placeValueFromStep sud (LastFreeCellCollumn p) = fillCell sud p (valueFromLFCC sud p)
 placeValueFromStep sud (SingleCandidate p) = fillCell sud p (valueFromSC sud p)
+placeValueFromStep sud (SinglePositionRow p) = fillCell sud p (valueFromSPR sud p)
+placeValueFromStep sud (SinglePositionColumn p) = fillCell sud p (valueFromSPC sud p)
+placeValueFromStep sud (SinglePositionBlock p) = fillCell sud p (valueFromSPB sud p)
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
+
+valueFromSPR :: Sudoku -> Position -> Value
+valueFromSPR sud pos = valueFromSPSection sud pos (rowPositions pos)
+
+valueFromSPC :: Sudoku -> Position -> Value
+valueFromSPC sud pos = valueFromSPSection sud pos (colPositions pos)
+
+valueFromSPB :: Sudoku -> Position -> Value
+valueFromSPB sud pos = valueFromSPSection sud pos (blockPositions pos)
+
+valueFromSPSection :: Sudoku -> Position -> [Position] -> Value
+valueFromSPSection sud pos secPos = case getSinglePosition sud pos secPos of
+                                        [x] -> Filled x
+                                        _ -> error "Not a single position"
+
 
 
 valueFromSC :: Sudoku -> Position -> Value
@@ -91,6 +112,9 @@ testStep sud (LastFreeCellBlock p) = lemmaLastCellInBlock sud p
 testStep sud (LastFreeCellRow p) = lemmaLastCellInRow sud p
 testStep sud (LastFreeCellCollumn p) = lemmaLastCellInColumn sud p
 testStep sud (SingleCandidate p) = lemmaSingleCandidate sud p
+testStep sud (SinglePositionRow p) = lemmaSinglePositionRow sud p
+testStep sud (SinglePositionColumn p) = lemmaSinglePositionColumn sud p
+testStep sud (SinglePositionBlock p) = lemmaSinglePositionBlock sud p
 testStep sud _ = error "lemma not implemented"
 
 
