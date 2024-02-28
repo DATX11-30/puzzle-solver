@@ -8,7 +8,7 @@ import Data.List
 data Step = LastFreeCellBlock Position |
             LastFreeCellRow Position |
             LastFreeCellCollumn Position |
-            LastRemainingCell Position |
+            SingleCandidate Position |
             BlockedByRow Position      |
             NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
@@ -16,7 +16,7 @@ data Step = LastFreeCellBlock Position |
 type Solution = [Step]
 
 steps :: [Position -> Step]
-steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, LastRemainingCell, BlockedByRow]
+steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, SingleCandidate]
 
 solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (generateSolution sud)
@@ -37,8 +37,16 @@ placeValueFromStep :: Sudoku -> Step -> Sudoku
 placeValueFromStep sud (LastFreeCellBlock p) = fillCell sud p (valueFromLFCB sud p)
 placeValueFromStep sud (LastFreeCellRow p) = fillCell sud p (valueFromLFCR sud p)
 placeValueFromStep sud (LastFreeCellCollumn p) = fillCell sud p (valueFromLFCC sud p)
+placeValueFromStep sud (SingleCandidate p) = fillCell sud p (valueFromSC sud p)
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
 
+
+valueFromSC :: Sudoku -> Position -> Value
+valueFromSC sud pos = case candidates of
+                        [x] -> Filled x
+                        _ -> error "Not a single candidate"
+    where
+        candidates = getCandidates sud pos
 
 valueFromLFCR :: Sudoku -> Position -> Value
 valueFromLFCR sud pos = valueFromLFCSection (rowFromPos sud pos)
@@ -82,6 +90,7 @@ testStep :: Sudoku -> Step -> Bool
 testStep sud (LastFreeCellBlock p) = lemmaLastCellInBlock sud p
 testStep sud (LastFreeCellRow p) = lemmaLastCellInRow sud p
 testStep sud (LastFreeCellCollumn p) = lemmaLastCellInColumn sud p
+testStep sud (SingleCandidate p) = lemmaSingleCandidate sud p
 testStep sud _ = error "lemma not implemented"
 
 

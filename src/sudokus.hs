@@ -36,6 +36,29 @@ legalSudoku = [[Filled Two, Filled Five, Filled Six, Filled Eight, Filled Three,
                  [Filled Nine, Filled Two, Filled Four, Filled Five, Filled Eight, Filled Three, Filled Seven, Filled Six, Filled One]
                 ]
 
+exSudoku1 :: Sudoku
+exSudoku1 = [[Empty, Empty, Empty, Filled Eight, Empty, Empty, Empty, Empty, Filled Nine],
+             [Empty, Filled One, Filled Nine, Empty, Empty, Filled Five, Filled Eight, Filled Three, Empty],
+             [Empty, Filled Four, Filled Three, Empty, Filled One, Empty, Empty, Empty, Filled Seven],
+             [Filled Four, Empty, Empty, Filled One, Filled Five, Empty, Empty, Empty, Filled Three],
+             [Empty, Empty, Filled Two, Filled Seven, Empty, Filled Four, Empty, Filled One, Empty],
+             [Empty, Filled Eight, Empty, Empty, Filled Nine, Empty, Filled Six, Empty, Empty],
+             [Empty, Filled Seven, Empty, Empty, Empty, Filled Six, Filled Three, Empty, Empty],
+             [Empty, Filled Three, Empty, Empty, Filled Seven, Empty, Empty, Filled Eight, Empty],
+             [Filled Nine, Empty, Filled Four, Filled Five, Empty, Empty, Empty, Empty, Filled One]]
+
+exSudoku2 :: Sudoku
+exSudoku2 = [[Empty, Empty, Filled Four, Empty, Empty, Filled Six, Empty, Filled Two, Empty],
+             [Empty, Empty, Filled Seven, Filled Eight, Empty, Empty, Filled Nine, Filled One, Empty],
+             [Empty, Empty, Empty, Empty, Empty, Empty, Filled Three, Empty, Filled Eight],
+             [Empty, Filled One, Filled Eight, Filled Three, Empty, Empty, Filled Two, Empty, Empty],
+             [Filled Three, Empty, Empty, Filled Seven, Filled Eight, Filled Nine, Empty, Empty, Filled One],
+             [Empty, Empty, Filled Nine, Empty, Empty, Filled One, Empty, Filled Six, Empty],
+             [Filled Eight, Empty, Filled Three, Empty, Empty, Empty, Filled Five, Empty, Empty],
+             [Empty, Filled Four, Filled Five, Empty, Empty, Filled Three, Filled Six, Empty, Empty],
+             [Empty, Filled Two, Filled Six, Filled Five, Empty, Empty, Filled One, Empty, Empty]]
+
+
 missingTopRowSud :: Sudoku
 missingTopRowSud = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Filled Seven, Filled One, Filled Nine, Filled Four, Filled Two, Filled Five, Filled Eight, Filled Three, Filled Six],
