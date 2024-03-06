@@ -64,17 +64,17 @@ singlePositionSection sud pos secPos = case getSinglePosition sud pos secPos of
 getSinglePosition :: Sudoku -> Position -> [Position] -> [SudVal]
 getSinglePosition sud pos secPos  = filter (getOnlyCellInSectionFromValue sud pos secPos) [One .. Nine]
 
-getOnlyCellInSectionFromValue :: Sudoku -> Position -> [Position] -> Sudoku.SudVal -> Bool
-getOnlyCellInSectionFromValue sud pos secPos v = (not $ any (\x -> validPosition sud x v) emptyPos) && validPosition sud pos v
+getOnlyCellInSectionFromValue :: Sudoku -> Position -> [Position] -> SudVal -> Bool
+getOnlyCellInSectionFromValue sud pos secPos v = not (any (\x -> validPosition sud x v) emptyPos) && validPosition sud pos v
     where
-        emptyPos = (filter (\x -> not (isFilled $ valFromPos sud x)) secPos) \\ [pos]
+        emptyPos = filter (\x -> not (isFilled $ valFromPos sud x)) secPos \\ [pos]
 
 
 validPosition :: Sudoku -> Position -> SudVal -> Bool
-validPosition sud pos v = all (\x -> not $ valueInSection x v) (sectionsFromPos sud pos)
+validPosition sud pos v = v `elem` getCandidates sud pos
 
 valueInSection :: Section -> SudVal -> Bool
-valueInSection sec v = elem (Filled v) sec
+valueInSection sec v = Filled v `elem` sec
 
 
 prop_lastCell :: Position -> Bool
