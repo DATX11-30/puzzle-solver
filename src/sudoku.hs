@@ -17,9 +17,14 @@ instance Show SudVal where
     show Eight = "8"
     show Nine = "9"
 
+data Line = Horizontal | Vertical
+    deriving (Eq, Show)
+
+data Note = Candidate SudVal | Line Line SudVal 
+    deriving (Eq, Show)
 data Value
     = Filled SudVal 
-    | Note [SudVal]
+    | Note [Note]
     | Empty
     deriving (Eq)
 

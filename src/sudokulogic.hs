@@ -28,14 +28,14 @@ lemmaLastCellInColumn s pos = lastFreeCellInSection s pos (colFromPos s pos)
 
 -- | if a section only has one empty cell, then that cell must be filled with the only possible value
 lastFreeCellInSection :: Sudoku -> Position -> Section -> Bool
-lastFreeCellInSection s pos sec = oneCellInSection s sec && not (isFilled $ valFromPos s pos) 
+lastFreeCellInSection s pos sec = oneCellInSection s sec && not (isFilled $ valFromPos s pos)
 
 -- | A lemma that checks if a value is the only possible value for a cell
 lemmaSingleCandidate :: Sudoku -> Position -> Bool
 lemmaSingleCandidate sud pos = case candidates of
                                 [x] -> True
                                 _ -> False
-    where 
+    where
         candidates = getCandidates sud pos
 
 -- | A lemma that checks if a value is the only possible value for a cell in a block
@@ -66,61 +66,91 @@ getSinglePosition sud pos secPos  = filter (getOnlyCellInSectionFromValue sud po
 
 getOnlyCellInSectionFromValue :: Sudoku -> Position -> [Position] -> Sudoku.SudVal -> Bool
 getOnlyCellInSectionFromValue sud pos secPos v = (not $ any (\x -> validPosition sud x v) emptyPos) && validPosition sud pos v
-    where 
+    where
         emptyPos = (filter (\x -> not (isFilled $ valFromPos sud x)) secPos) \\ [pos]
-        
+
 
 validPosition :: Sudoku -> Position -> SudVal -> Bool
-validPosition sud pos v = all (\x -> not $ valueInSection x v) (sectionsFromPos sud pos) 
+validPosition sud pos v = all (\x -> not $ valueInSection x v) (sectionsFromPos sud pos)
 
 valueInSection :: Section -> SudVal -> Bool
 valueInSection sec v = elem (Filled v) sec
 
 
 prop_lastCell :: Position -> Bool
-prop_lastCell (row, col) = lemmaLastCellInRow (fillCell illegalSudoku (row, col) Empty) (row, col) && 
-                           lemmaLastCellInColumn (fillCell illegalSudoku (row, col) Empty) (row, col) && 
+prop_lastCell (row, col) = lemmaLastCellInRow (fillCell illegalSudoku (row, col) Empty) (row, col) &&
+                           lemmaLastCellInColumn (fillCell illegalSudoku (row, col) Empty) (row, col) &&
                            lemmaLastCellInBlock (fillCell illegalSudoku (row, col) Empty) (row, col)
 
 -- | Returns all possible candidates 
 getCandidates :: Sudoku -> Position -> [SudVal]
 getCandidates s pos = candidates
-    where 
-        candidates = [x | x <- [One ..], not (elem (Filled x) occupiedVals)]
-        sections = sectionsFromPos s pos
-        occupiedVals = values ++ map Filled pairs
-        pairs = nub $ concatMap notePairs sections 
-        values = nub $ concat sections 
+    where
+        candidates = [x | x <- [One ..], Filled x `notElem` occupiedVals]
+        row = rowFromPos s pos
+        col = colFromPos s pos
+        block = blockFromPos s pos
+        lineCands = noteLineCandidatesRow row ++ noteLineCandidatesCol col
+        sections = [row, col, block]
+        occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
+        pairs = nub $ concatMap notePairs sections
+        values = nub $ concat sections
 
 -- | Testes whether lemma singele candidate is valid
 prop_singleCandidate :: Position -> Bool
-prop_singleCandidate (row, col) = lemmaSingleCandidate (fillCell legalSudoku (row, col) Empty) (row, col) && 
+prop_singleCandidate (row, col) = lemmaSingleCandidate (fillCell legalSudoku (row, col) Empty) (row, col) &&
                                  not (lemmaSingleCandidate legalSudoku (row, col))
+
 
 
 --------------------------------------------------------------------------------------------------------
 -- Helper functions
+-- | If the section includes a line of cellc witch are marked as Candidate line Horizontal, then return those values
+noteLineCandidatesRow :: Row -> [SudVal]
+noteLineCandidatesRow sec = nub values
+    where
+        notes = filter isNote sec
+        lNotes = map (\(Note x) -> filter (not.isCandidate) x) notes
+        values = [v | l <- lNotes, (Line t v) <- l, t == Horizontal]
+
+-- | If the section includes a line of cellc witch are marked as Candidate line Vertical, then return those values
+noteLineCandidatesCol :: Column -> [SudVal]
+noteLineCandidatesCol sec = nub values
+    where
+        notes = filter isNote sec
+        lNotes = map (\(Note x) -> filter (not.isCandidate) x) notes
+        values = [v | l <- lNotes, (Line t v) <- l, t == Vertical]
+
+-- | Returns true if all positions either are fixed at x or fixed at y
+secIsLine :: [Position] -> Bool
+secIsLine sec = all (\x -> fst x == fst (head sec)) sec
 
 -- | If the section contains two cells witch include a note with the same valus, then return those values
 notePairs :: Section -> [SudVal]
-notePairs sec = nub $ concat pairs
+notePairs sec = nub pVals
     where
         notes = filter isNote sec
-        pairs = [x | (Note x) <- notes, (Note y) <- (delete (Note x) notes), x === y]
+        cNotes = map (\(Note x) -> filter isCandidate x) notes
+        pairs = [x | x <- cNotes,  y <- delete x cNotes, x === y]
+        pVals = map (\(Candidate x) -> x) (concat pairs)
 
 -- | Returns true if two lists are set-equal
 (===) :: Eq a => [a] -> [a] -> Bool
-(===) xs ys = xs \\ ys == []
+(===) xs ys = null (xs \\ ys)
+
+isCandidate :: Note -> Bool
+isCandidate (Candidate _) = True
+isCandidate _ = False
 
 isNote :: Value -> Bool
 isNote (Note _) = True
 isNote _ = False
 
 testSud :: Sudoku
-testSud = illegalSudoku 
+testSud = illegalSudoku
 
 oneCellInSection :: Sudoku -> [Value] -> Bool
-oneCellInSection s vs = length (filter isFilled vs) == 8 
+oneCellInSection s vs = length (filter isFilled vs) == 8
 
 
 
