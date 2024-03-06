@@ -113,16 +113,6 @@ blockPositions (row, col) = [(r+i,c+j) |  i <- [0..2], j <- [0..2]]
 sectionsFromPos :: Sudoku -> Position -> [Section]
 sectionsFromPos sud pos = [rowFromPos sud pos, colFromPos sud pos, blockFromPos sud pos]
 
--- | Show a soduku in a more readable way. 
--- | for correct formating do not forget putStrLn before calling this function
-showSudoku :: Sudoku -> String
-showSudoku [] = ""
-showSudoku (r1:r2:r3:rs) = showR r1 ++ "\n" ++ showR r2  ++ "\n" ++  showR r3 ++ "\n" ++ "-----------------------" ++ "\n" ++ showSudoku rs
-        where   showR :: [Value] -> String
-                showR [] = "||"
-                showR (x1:x2:x3:xs) = "||" ++ show x1 ++ " " ++ show x2 ++ " " ++ show x3 ++ showR xs
-
-
 isFilled :: Value -> Bool
 isFilled (Filled _) = True
 isFilled _ = False
