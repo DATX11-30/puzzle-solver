@@ -4,6 +4,9 @@ import Sudoku
 import Sudokus
 import Data.List
 import Control.Applicative (Alternative(empty))
+import Debug.Trace (trace)
+import Data.Type.Coercion (trans)
+import Test.QuickCheck (Positive(Positive))
 
 type Lemma = Sudoku -> Position -> Bool
 
@@ -49,6 +52,36 @@ lemmaSinglePositionRow sud pos = singlePositionSection sud pos (rowPositions pos
 -- | A lemma that checks if a value is the only possible value for a cell in a column
 lemmaSinglePositionColumn :: Sudoku -> Position -> Bool
 lemmaSinglePositionColumn sud pos = singlePositionSection sud pos (colPositions pos)
+
+-- | 
+lemmaCandidateLine :: Sudoku -> Position -> Bool
+lemmaCandidateLine sud pos = case concat lines of
+                                [] -> False
+                                _ -> True 
+    where 
+        candidates = getCandidates sud pos
+        lines = map (lineBlock sud pos) candidates
+
+lineBlock :: Sudoku -> Position -> SudVal -> [Line]
+lineBlock sud pos val
+            | isHorizontal $ cand blockPos = [Horizontal]
+            | isVertical $ cand blockPos = [Vertical]
+            | otherwise = []
+  where
+      blockPos = blockPositions pos
+      horizontals
+        = [take 3 blockPos, take 3 (drop 3 blockPos),
+           take 3 (drop 6 blockPos)]
+      verticals = transpose horizontals
+      cand = filter (\ x -> val `elem` getCandidates sud x)
+      isHorizontal :: [Position] -> Bool
+      isHorizontal positions
+        = all (\ x -> fst x == fst pos) (cand positions)
+      isVertical :: [Position] -> Bool
+      isVertical positions
+        = all (\ x -> snd x == snd pos) (cand positions)
+
+
 
 prop_singlePosition_section :: Position -> [SudVal]
 prop_singlePosition_section pos = getSinglePosition missingTopRowSud pos (blockPositions pos)
