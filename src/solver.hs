@@ -12,14 +12,14 @@ data Step = LastFreeCellBlock Position |
             SinglePositionRow Position |
             SinglePositionColumn Position |
             SinglePositionBlock Position |
-            BlockedByRow Position      |
+            CandidateLine Position      |
             NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
 
 type Solution = [Step]
 
 steps :: [Position -> Step]
-steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, SingleCandidate, SinglePositionRow, SinglePositionColumn, SinglePositionBlock]
+steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, SingleCandidate, SinglePositionRow, SinglePositionColumn, SinglePositionBlock, CandidateLine]
 
 solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (generateSolution sud)
@@ -44,6 +44,7 @@ placeValueFromStep sud (SingleCandidate p) = fillCell sud p (valueFromSC sud p)
 placeValueFromStep sud (SinglePositionRow p) = fillCell sud p (valueFromSPR sud p)
 placeValueFromStep sud (SinglePositionColumn p) = fillCell sud p (valueFromSPC sud p)
 placeValueFromStep sud (SinglePositionBlock p) = fillCell sud p (valueFromSPB sud p)
+placeValueFromStep sud (CandidateLine p) = fillCell sud p (valueFromCL sud p)
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
 
 valueFromSPR :: Sudoku -> Position -> Value
@@ -85,6 +86,16 @@ valueFromLFCSection sec = case list' of
     where
         list' = [Filled x | x <- [One ..]] \\ sec
 
+valueFromCL :: Sudoku -> Position -> Value
+valueFromCL sud pos = case head lines of 
+                        (l, v) -> Note [Line l v]
+                        _ -> error "Not a single candidate"
+    where 
+        candidates = getCandidates sud pos
+        lines = [(head $ lineBlock sud pos l, l) | l <- candidates, lineBlock sud pos l /= []]
+
+
+
 -- | next step in solving the sudoku
 nextStep :: Sudoku -> [Position -> Step] -> Step
 nextStep sud [] = NOAVAILABLESTEPS
@@ -115,6 +126,7 @@ testStep sud (SingleCandidate p) = lemmaSingleCandidate sud p
 testStep sud (SinglePositionRow p) = lemmaSinglePositionRow sud p
 testStep sud (SinglePositionColumn p) = lemmaSinglePositionColumn sud p
 testStep sud (SinglePositionBlock p) = lemmaSinglePositionBlock sud p
+testStep sud (CandidateLine p) = lemmaCandidateLine sud p
 testStep sud _ = error "lemma not implemented"
 
 
