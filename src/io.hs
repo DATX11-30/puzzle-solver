@@ -33,3 +33,33 @@ showSud sud = topRow
 showRow :: [Value] -> String
 showRow [] = ""
 showRow (x1:x2:x3:xs) = "\9474" ++ " " ++ show x1 ++ " " ++ show x2 ++ " " ++ show x3 ++ " " ++ showRow xs
+
+charToSudVal :: Char -> Value
+charToSudVal '1' = Filled One
+charToSudVal '2' = Filled Two
+charToSudVal '3' = Filled Three
+charToSudVal '4' = Filled Four
+charToSudVal '5' = Filled Five
+charToSudVal '6' = Filled Six
+charToSudVal '7' = Filled Seven
+charToSudVal '8' = Filled Eight
+charToSudVal '9' = Filled Nine
+charToSudVal _ = Empty -- Maybe make this an error and zero a separate case?
+
+parseSudoku :: String -> Sudoku
+parseSudoku [] = []
+parseSudoku xs = parse (take 9 xs) : parseSudoku (drop 9 xs)
+        where
+                parse :: [Char] -> [Value]
+                parse [] = []
+                parse (y:ys) = charToSudVal y : parse ys
+
+readSudoku :: FilePath -> IO Sudoku
+readSudoku filepath = do
+        content <- readFile filepath
+        return $ parseSudoku $ take 81 content
+
+showSudokuFromFile :: FilePath -> IO ()
+showSudokuFromFile filepath = do
+        sud <- readSudoku filepath
+        showSudoku sud
