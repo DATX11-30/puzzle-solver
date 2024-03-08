@@ -1,5 +1,10 @@
-import SudokuLogic
 import Test.QuickCheck
+import IO
+import Logic
+import Solver
+import Sudoku
+import SudokuLogic
+import Sudokus
 
 -- Test function for checking that it works
 prop_reverse :: [Int] -> Bool
