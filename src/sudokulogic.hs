@@ -57,30 +57,33 @@ lemmaSinglePositionColumn sud pos = singlePositionSection sud pos (colPositions 
 lemmaCandidateLine :: Sudoku -> Position -> Bool
 lemmaCandidateLine sud pos = case concat lines of
                                 [] -> False
-                                _ -> True 
-    where 
+                                _ -> True
+    where
         candidates = getCandidates sud pos
         lines = map (lineBlock sud pos) candidates
 
 lineBlock :: Sudoku -> Position -> SudVal -> [Line]
 lineBlock sud pos val
-            | isHorizontal $ cand blockPos = [Horizontal]
-            | isVertical $ cand blockPos = [Vertical]
+            | isHorizontal && length candidates > 1 && not (isIncluded Horizontal) = [Horizontal]
+            | isVertical && length candidates > 1 && not (isIncluded Vertical) = [Vertical]
             | otherwise = []
   where
+      isIncluded dir = case posVal of
+                          Note x -> Line dir val `elem` x
+                          _ -> False
+      posVal = valFromPos sud pos
       blockPos = blockPositions pos
-      horizontals
-        = [take 3 blockPos, take 3 (drop 3 blockPos),
-           take 3 (drop 6 blockPos)]
-      verticals = transpose horizontals
+      candidates = cand blockPos
       cand = filter (\ x -> val `elem` getCandidates sud x)
-      isHorizontal :: [Position] -> Bool
-      isHorizontal positions
-        = all (\ x -> fst x == fst pos) (cand positions)
-      isVertical :: [Position] -> Bool
-      isVertical positions
-        = all (\ x -> snd x == snd pos) (cand positions)
+      isHorizontal = all (\ x -> fst x == fst pos) candidates
+      isVertical = all (\ x -> snd x == snd pos) candidates
 
+prop_lineBlock :: Bool
+prop_lineBlock = lineBlock sud (0,0) Two == [Horizontal] &&
+                 lineBlock sud (0,1) Five == [Horizontal] &&
+                 lineBlock sud (0,3) Six == [Horizontal]
+        where
+            sud = fillCell (fillCell (fillCell legalSudoku (0,0) Empty) (0,1) Empty) (0,2) Empty
 
 
 prop_singlePosition_section :: Position -> [SudVal]
@@ -119,11 +122,11 @@ prop_lastCell (row, col) = lemmaLastCellInRow (fillCell illegalSudoku (row, col)
 getCandidates :: Sudoku -> Position -> [SudVal]
 getCandidates s pos = candidates
     where
-        candidates = [x | x <- [One ..], Filled x `notElem` occupiedVals]
+        candidates = [x | x <- [One ..], Filled x `notElem` (nub occupiedVals)]
         row = rowFromPos s pos
         col = colFromPos s pos
         block = blockFromPos s pos
-        lineCands = noteLineCandidatesRow row ++ noteLineCandidatesCol col
+        lineCands = noteLineCandidatesRow (row \\ (intersect row block)) ++ noteLineCandidatesCol (col \\ (intersect col block))
         sections = [row, col, block]
         occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
         pairs = nub $ concatMap notePairs sections
@@ -143,16 +146,21 @@ noteLineCandidatesRow :: Row -> [SudVal]
 noteLineCandidatesRow sec = nub values
     where
         notes = filter isNote sec
-        lNotes = map (\(Note x) -> filter (not.isCandidate) x) notes
-        values = [v | l <- lNotes, (Line t v) <- l, t == Horizontal]
+        lNotes = concatMap (\(Note x) -> filter (not.isCandidate) x) notes
+        values = [v | (Line t v) <- lNotes, t == Horizontal]
+
+prop_lineCandRow :: [SudVal]
+prop_lineCandRow = noteLineCandidatesRow (head legalSudoku)
+    where
+        sud = fillCell (fillCell (fillCell legalSudoku (0,0) Empty) (0,1) Empty) (0,2) Empty
 
 -- | If the section includes a line of cellc witch are marked as Candidate line Vertical, then return those values
 noteLineCandidatesCol :: Column -> [SudVal]
 noteLineCandidatesCol sec = nub values
     where
         notes = filter isNote sec
-        lNotes = map (\(Note x) -> filter (not.isCandidate) x) notes
-        values = [v | l <- lNotes, (Line t v) <- l, t == Vertical]
+        lNotes = concatMap (\(Note x) -> filter (not.isCandidate) x) notes
+        values = [v | (Line t v) <- lNotes, t == Vertical]
 
 -- | Returns true if all positions either are fixed at x or fixed at y
 secIsLine :: [Position] -> Bool

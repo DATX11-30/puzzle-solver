@@ -1,10 +1,10 @@
 module Sudoku where
 import GHC.Arr (fill)
-import Data.List 
+import Data.List
 
 -- | A representation of the values in a sudoku from 0-9 TODO: SHOULD BE RENAMED!!!!!
 data SudVal = One | Two | Three | Four | Five | Six | Seven | Eight | Nine
-    deriving (Eq, Enum, Bounded) 
+    deriving (Eq, Enum, Bounded)
 
 instance Show SudVal where
     show One = "1"
@@ -18,12 +18,21 @@ instance Show SudVal where
     show Nine = "9"
 
 data Line = Horizontal | Vertical
-    deriving (Eq, Show)
+    deriving (Eq)
 
-data Note = Candidate SudVal | Line Line SudVal 
-    deriving (Eq, Show)
+instance Show Line where
+    show Horizontal = "-"
+    show Vertical = "|"
+
+data Note = Candidate SudVal | Line Line SudVal
+    deriving (Eq)
+
+instance Show Note where
+    show (Candidate x) = show x
+    show (Line l x) = show l ++ show x
+
 data Value
-    = Filled SudVal 
+    = Filled SudVal
     | Note [Note]
     | Empty
     deriving (Eq)
@@ -32,7 +41,7 @@ instance Show Value where
     show (Filled x) = show x
     show (Note xs) = show xs
     show Empty = " "
-    
+
 -- | A representation of a sudoku [Rows] 
 type Sudoku = [[Value]]
 
@@ -57,9 +66,11 @@ type Block =  Section
 fillCell :: Sudoku -> Position -> Value -> Sudoku
 fillCell sud (row, col) v = take row sud ++ [changeAtIndex (sud !! row) col v] ++ drop (row+1) sud
     where
-        changeAtIndex :: [a] -> Int -> a -> [a]
-        changeAtIndex (x:xs) p v | p == 0 = v:xs
-                         | otherwise = x : changeAtIndex xs (p-1) v
+        changeAtIndex :: [Value] -> Int -> Value -> [Value]
+        changeAtIndex (x:xs) p val | p == 0 = case (val, x) of
+                                            --(Note a, Note b) ->  Note (a++b):xs
+                                            _ -> val:xs
+                         | otherwise = x : changeAtIndex xs (p-1) val
 
 -- | Property for fillCell, checks if cell filled with its original value is the same as the original sudoku
 prop_fillCell :: Sudoku -> Position -> Bool
@@ -68,7 +79,7 @@ prop_fillCell sud (row, col) = fillCell sud (row,col) (sud !! row !! col) == sud
 -- | Property for fillCell, checks if sudoku with cell filled with a value has that value at the correct position
 prop_fillCell2 :: Sudoku -> Position -> Value -> Bool
 prop_fillCell2 sud (row, col) v = fillCell sud (row,col) v !! row !! col == v
-        
+
 
 -- | Returns the value at the given position
 valFromPos :: Sudoku -> (Int, Int) -> Value
@@ -84,7 +95,7 @@ columns = transpose
 
 -- | Returns all blocks
 blocks :: Sudoku ->  [Block]
-blocks sud = [[valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,6]] 
+blocks sud = [[valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,6]]
 
 -- | Get the row that this position is included in
 rowFromPos :: Sudoku -> Position -> Row
@@ -95,7 +106,7 @@ colFromPos :: Sudoku -> Position -> Column
 colFromPos sud (row, col) = transpose sud !! col
 
 -- | Get the block that this position is included in
-blockFromPos :: Sudoku -> Position -> Block 
+blockFromPos :: Sudoku -> Position -> Block
 blockFromPos sud (row, col) = [valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0..2]]
     where
         r = (row `div` 3) * 3
