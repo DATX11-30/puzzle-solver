@@ -63,3 +63,9 @@ showSudokuFromFile :: FilePath -> IO ()
 showSudokuFromFile filepath = do
         sud <- readSudoku filepath
         showSudoku sud
+
+showSolvedSudokuFromFile :: FilePath -> IO ()
+showSolvedSudokuFromFile filepath = do
+        sud <- readSudoku filepath
+        showSolvedSudoku sud
+        
