@@ -45,7 +45,7 @@ charToSudVal '7' = Filled Seven
 charToSudVal '8' = Filled Eight
 charToSudVal '9' = Filled Nine
 charToSudVal '0' = Empty
-charToSudVal _ = error "incorect value in file"
+charToSudVal _ = error "incorrect value in file"
 
 parseSudoku :: String -> Sudoku
 parseSudoku [] = []
