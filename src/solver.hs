@@ -19,7 +19,10 @@ data Step = LastFreeCellBlock Position |
 type Solution = [Step]
 
 steps :: [Position -> Step]
-steps = [LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, SingleCandidate, SinglePositionRow, SinglePositionColumn, SinglePositionBlock, CandidateLine]
+steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, 
+        SingleCandidate, 
+        SinglePositionRow, SinglePositionColumn, SinglePositionBlock, CandidateLine
+        ]
 
 solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (generateSolution sud)
@@ -87,12 +90,13 @@ valueFromLFCSection sec = case list' of
         list' = [Filled x | x <- [One ..]] \\ sec
 
 valueFromCL :: Sudoku -> Position -> Value
-valueFromCL sud pos = case head lines of 
-                        (l, v) -> Note [Line l v]
+valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of 
+                        as -> Note $ map (\([l],v) -> Line l v) as
                         _ -> error "Not a single candidate"
     where 
         candidates = getCandidates sud pos
-        lines = [(head $ lineBlock sud pos l, l) | l <- candidates, lineBlock sud pos l /= []]
+        lines = [(lineBlock sud pos l, l) | l <- candidates, lineBlock sud pos l /= []]
+
 
 
 
