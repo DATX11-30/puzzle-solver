@@ -3,6 +3,7 @@ module Solver where
 import Sudoku
 import SudokuLogic
 import Sudokus
+import Optimizer
 import Data.List
 
 data Step = LastFreeCellBlock Position |
@@ -40,14 +41,14 @@ generateSolution sud = case next of
         next = nextStep sud steps
 
 placeValueFromStep :: Sudoku -> Step -> Sudoku
-placeValueFromStep sud (LastFreeCellBlock p) = fillCell sud p (valueFromLFCB sud p)
-placeValueFromStep sud (LastFreeCellRow p) = fillCell sud p (valueFromLFCR sud p)
-placeValueFromStep sud (LastFreeCellCollumn p) = fillCell sud p (valueFromLFCC sud p)
-placeValueFromStep sud (SingleCandidate p) = fillCell sud p (valueFromSC sud p)
-placeValueFromStep sud (SinglePositionRow p) = fillCell sud p (valueFromSPR sud p)
+placeValueFromStep sud (LastFreeCellBlock p)    = fillCell sud p (valueFromLFCB sud p)
+placeValueFromStep sud (LastFreeCellRow p)      = fillCell sud p (valueFromLFCR sud p)
+placeValueFromStep sud (LastFreeCellCollumn p)  = fillCell sud p (valueFromLFCC sud p)
+placeValueFromStep sud (SingleCandidate p)      = fillCell sud p (valueFromSC sud p)
+placeValueFromStep sud (SinglePositionRow p)    = fillCell sud p (valueFromSPR sud p)
 placeValueFromStep sud (SinglePositionColumn p) = fillCell sud p (valueFromSPC sud p)
-placeValueFromStep sud (SinglePositionBlock p) = fillCell sud p (valueFromSPB sud p)
-placeValueFromStep sud (CandidateLine p) = fillCell sud p (valueFromCL sud p)
+placeValueFromStep sud (SinglePositionBlock p)  = fillCell sud p (valueFromSPB sud p)
+placeValueFromStep sud (CandidateLine p)        = fillCell sud p (valueFromCL sud p)
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
 
 valueFromSPR :: Sudoku -> Position -> Value
