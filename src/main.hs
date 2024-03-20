@@ -5,6 +5,8 @@ import Solver
 import Sudoku
 import SudokuLogic
 import Sudokus
+import Optimizer
+import Data.List
 
 -- Test function for checking that it works
 prop_reverse :: [Int] -> Bool

@@ -107,14 +107,18 @@ nextStep sud [] = NOAVAILABLESTEPS
 nextStep sud (sf:sfs) = case tryStepsOnEmpty sud sf of
                             NOAVAILABLESTEPS -> nextStep sud sfs
                             x -> x
-
+      
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Step
-tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (emptyPositions sud)
+tryStepsOnEmpty sud sf = tryStepOnPositions sud sf ((emptyPositions sud))  --(emptyPositions sud)
 
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
 emptyPositions sud = [(r,c) | r <- [0..8], c <- [0..8], not (isFilled (valFromPos sud (r,c)))]
+
+propOrderPos sud = (finalOrderOfPosition sud \\ emptyPositions sud)
+
+--prop_getAllPos sud = all (\x -> elem x (emptyPositions sud)) (concat $ getAllPositionForValue sud)
 
 -- | Tries to apply a lemma/step to all position, 
 tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Step
