@@ -6,6 +6,7 @@ import Sudokus
 import Optimizer
 import Data.List
 
+
 data Step = LastFreeCellBlock Position |
             LastFreeCellRow Position |
             LastFreeCellCollumn Position |
@@ -110,7 +111,7 @@ nextStep sud (sf:sfs) = case tryStepsOnEmpty sud sf of
       
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Step
-tryStepsOnEmpty sud sf = tryStepOnPositions sud sf ((emptyPositions sud))  --(emptyPositions sud)
+tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (finalOrderOfPosition sud)  --(emptyPositions sud)
 
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
