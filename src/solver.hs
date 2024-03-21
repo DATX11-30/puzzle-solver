@@ -59,15 +59,19 @@ placeValueFromStep sud (NakedPairColumn p) = valueFromNPC sud p
 placeValueFromStep sud (NakedPairBlock p) = valueFromNPB sud p
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
 
+-- | Returns a soduku with both values from a naked pair filled in i a row
 valueFromNPR :: Sudoku -> Position -> Sudoku
 valueFromNPR sud pos = valueFromNPSection sud pos (rowPositions pos)
 
+-- | Returns a soduku with both values from a naked pair filled in i a column
 valueFromNPC :: Sudoku -> Position -> Sudoku
 valueFromNPC sud pos = valueFromNPSection sud pos (colPositions pos)
 
+-- | Returns a soduku with both values from a naked pair filled in i a block
 valueFromNPB :: Sudoku -> Position -> Sudoku
 valueFromNPB sud pos = valueFromNPSection sud pos (blockPositions pos)
 
+-- | Returns a soduku with both values from a naked pair filled in i a section
 valueFromNPSection :: Sudoku -> Position -> [Position] -> Sudoku
 valueFromNPSection sud pos secPos = case getNakedPairInSection sud pos secPos of
                                         (p, v1:v2:[]) -> fillCell 
@@ -75,20 +79,25 @@ valueFromNPSection sud pos secPos = case getNakedPairInSection sud pos secPos of
                                                         pos (Note [Candidate v1, Candidate v2])
                                         _ -> error "Not a naked pair"
 
+-- | Returns the value of a single position in a row
 valueFromSPR :: Sudoku -> Position -> Value
 valueFromSPR sud pos = valueFromSPSection sud pos (rowPositions pos)
 
+-- | Returns the value of a single position in a column
 valueFromSPC :: Sudoku -> Position -> Value
 valueFromSPC sud pos = valueFromSPSection sud pos (colPositions pos)
 
+-- | Returns the value of a single position in a block
 valueFromSPB :: Sudoku -> Position -> Value
 valueFromSPB sud pos = valueFromSPSection sud pos (blockPositions pos)
 
+-- | Returns the value of a single position in a section
 valueFromSPSection :: Sudoku -> Position -> [Position] -> Value
 valueFromSPSection sud pos secPos = case getSinglePosition sud pos secPos of
                                         [x] -> Filled x
                                         _ -> error "Not a single position"
 
+-- | Returns the value of a single candidate in a cell
 valueFromSC :: Sudoku -> Position -> Value
 valueFromSC sud pos = case candidates of
                         [x] -> Filled x

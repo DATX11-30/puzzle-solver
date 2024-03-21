@@ -65,16 +65,17 @@ lemmaNakedPairBlock sud pos = nakedPairSection sud pos (blockPositions pos)
 nakedPairSection :: Sudoku -> Position -> [Position] -> Bool
 nakedPairSection sud pos sec = case getNakedPairInSection sud pos sec of
                                     (_, []) -> False
-                                    _ -> True
+                                    (p, vs)-> not (valFromPos sud pos == Note (map Candidate vs)
+                                              && valFromPos sud p == Note (map Candidate vs))
 
 getNakedPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
-getNakedPairInSection sud pos sec =  case p of 
+getNakedPairInSection sud pos sec =  case p of
                                         [] -> (pos, [])
                                         _ -> (head p, posCandidates)
     where
         p = nakedPairs \\ [pos]
         posCandidates = getCandidates sud pos
-        pairs = filter (\x -> length (getCandidates sud x) == 2) sec
+        pairs = filter (\x -> length (getCandidates sud x) == 2 && not (isFilled (valFromPos sud x))) sec
         nakedPairs = filter (\x -> posCandidates === getCandidates sud x) pairs
 
 
@@ -154,7 +155,12 @@ getCandidates s pos = candidates
         lineCands = noteLineCandidatesRow (row \\ (intersect row block)) ++ noteLineCandidatesCol (col \\ (intersect col block))
         sections = [row, col, block]
         occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
-        pairs = nub $ concatMap notePairs sections
+        pairs =  (nub $ concatMap notePairs sections) \\
+                    case valFromPos s pos of
+                        Note [Candidate a, Candidate b] -> [a,b]
+                        _                               -> []
+
+
         values = nub $ concat sections
 
 -- | Testes whether lemma singele candidate is valid
