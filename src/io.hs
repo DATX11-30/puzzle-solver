@@ -2,6 +2,7 @@ module IO where
 import Solver
 import Sudokus
 import Sudoku
+import SudokuLogic (getCandidates)
 
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
@@ -11,7 +12,7 @@ showSolvedSudoku :: Sudoku -> IO ()
 showSolvedSudoku sud = showSudoku (solve sud)
 
 showSud :: Sudoku -> String
-showSud sud = topRow     
+showSud sud = topRow
             ++ "\n" ++ showRow r1 ++ "\9474"
             ++ "\n" ++ showRow r2 ++ "\9474"
             ++ "\n" ++ showRow r3 ++ "\9474"
@@ -24,11 +25,11 @@ showSud sud = topRow
             ++ "\n" ++ showRow r8 ++ "\9474"
             ++ "\n" ++ showRow r9 ++ "\9474"
             ++ "\n" ++ botRow
-    where 
+    where
         topRow = "\9484" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9516"++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9516"++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9488"
         midRow = "\9500" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9532"++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9532"++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9508"
         botRow = "\9492" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9524"++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9524"++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9472" ++ "\9496"
- 
+
         (r1:r2:r3:r4:r5:r6:r7:r8:r9:xs) = rows sud
 showRow :: [Value] -> String
 showRow [] = ""
@@ -63,3 +64,23 @@ showSudokuFromFile :: FilePath -> IO ()
 showSudokuFromFile filepath = do
         sud <- readSudoku filepath
         showSudoku sud
+
+showSolvedSudokuFromFile :: FilePath -> IO ()
+showSolvedSudokuFromFile filepath = do
+        sud <- readSudoku filepath
+        showSolvedSudoku sud
+
+generateSolutionFromFile :: FilePath -> IO ()
+generateSolutionFromFile filepath = do
+        sud <- readSudoku filepath
+        print (generateSolution sud)
+
+applySolutionFromFile :: FilePath -> [Step] -> IO ()
+applySolutionFromFile filepath steps = do
+        sud <- readSudoku filepath
+        showSudoku (applySolution sud steps)
+
+getCandidatesIO :: FilePath -> Position -> IO [SudVal]
+getCandidatesIO filepath pos = do
+        sud <- readSudoku filepath
+        return $ getCandidates sud pos

@@ -68,9 +68,10 @@ fillCell sud (row, col) v = take row sud ++ [changeAtIndex (sud !! row) col v] +
     where
         changeAtIndex :: [Value] -> Int -> Value -> [Value]
         changeAtIndex (x:xs) p val | p == 0 = case (val, x) of
-                                            --(Note a, Note b) ->  Note (a++b):xs
+                                            (Note a, Note b) -> if null (a \\ b) then val:xs else Note (a++b):xs
                                             _ -> val:xs
                          | otherwise = x : changeAtIndex xs (p-1) val
+
 
 -- | Property for fillCell, checks if cell filled with its original value is the same as the original sudoku
 prop_fillCell :: Sudoku -> Position -> Bool

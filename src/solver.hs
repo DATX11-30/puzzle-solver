@@ -7,15 +7,18 @@ import Optimizer
 import Data.List
 
 
-data Step = LastFreeCellBlock Position |
-            LastFreeCellRow Position |
-            LastFreeCellCollumn Position |
-            SingleCandidate Position |
-            SinglePositionRow Position |
-            SinglePositionColumn Position |
-            SinglePositionBlock Position |
-            CandidateLine Position      |
-            NOAVAILABLESTEPS
+data Step =     LastFreeCellBlock Position      |
+                LastFreeCellRow Position        |
+                LastFreeCellCollumn Position    |
+                SingleCandidate Position        |
+                SinglePositionRow Position      |
+                SinglePositionColumn Position   |
+                SinglePositionBlock Position    |
+                CandidateLine Position          |
+                NakedPairRow Position           |
+                NakedPairColumn Position        |
+                NakedPairBlock Position         |
+                NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
 
 type Solution = [Step]
@@ -23,7 +26,9 @@ type Solution = [Step]
 steps :: [Position -> Step]
 steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, 
         SingleCandidate, 
-        SinglePositionRow, SinglePositionColumn, SinglePositionBlock, CandidateLine
+        SinglePositionRow, SinglePositionColumn, SinglePositionBlock,
+        NakedPairBlock, NakedPairRow, NakedPairColumn,
+        CandidateLine
         ]
 
 solve :: Sudoku -> Sudoku
@@ -48,26 +53,52 @@ placeValueFromStep sud (LastFreeCellCollumn p)  = fillCell sud p (valueFromLFCC 
 placeValueFromStep sud (SingleCandidate p)      = fillCell sud p (valueFromSC sud p)
 placeValueFromStep sud (SinglePositionRow p)    = fillCell sud p (valueFromSPR sud p)
 placeValueFromStep sud (SinglePositionColumn p) = fillCell sud p (valueFromSPC sud p)
-placeValueFromStep sud (SinglePositionBlock p)  = fillCell sud p (valueFromSPB sud p)
-placeValueFromStep sud (CandidateLine p)        = fillCell sud p (valueFromCL sud p)
+placeValueFromStep sud (SinglePositionBlock p) = fillCell sud p (valueFromSPB sud p)
+placeValueFromStep sud (CandidateLine p) = fillCell sud p (valueFromCL sud p)
+placeValueFromStep sud (NakedPairRow p) = valueFromNPR sud p
+placeValueFromStep sud (NakedPairColumn p) = valueFromNPC sud p
+placeValueFromStep sud (NakedPairBlock p) = valueFromNPB sud p
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
 
+-- | Returns a soduku with both values from a naked pair filled in i a row
+valueFromNPR :: Sudoku -> Position -> Sudoku
+valueFromNPR sud pos = valueFromNPSection sud pos (rowPositions pos)
+
+-- | Returns a soduku with both values from a naked pair filled in i a column
+valueFromNPC :: Sudoku -> Position -> Sudoku
+valueFromNPC sud pos = valueFromNPSection sud pos (colPositions pos)
+
+-- | Returns a soduku with both values from a naked pair filled in i a block
+valueFromNPB :: Sudoku -> Position -> Sudoku
+valueFromNPB sud pos = valueFromNPSection sud pos (blockPositions pos)
+
+-- | Returns a soduku with both values from a naked pair filled in i a section
+valueFromNPSection :: Sudoku -> Position -> [Position] -> Sudoku
+valueFromNPSection sud pos secPos = case getNakedPairInSection sud pos secPos of
+                                        (p, v1:v2:[]) -> fillCell 
+                                                        (fillCell sud p (Note [Candidate v1, Candidate v2])) 
+                                                        pos (Note [Candidate v1, Candidate v2])
+                                        _ -> error "Not a naked pair"
+
+-- | Returns the value of a single position in a row
 valueFromSPR :: Sudoku -> Position -> Value
 valueFromSPR sud pos = valueFromSPSection sud pos (rowPositions pos)
 
+-- | Returns the value of a single position in a column
 valueFromSPC :: Sudoku -> Position -> Value
 valueFromSPC sud pos = valueFromSPSection sud pos (colPositions pos)
 
+-- | Returns the value of a single position in a block
 valueFromSPB :: Sudoku -> Position -> Value
 valueFromSPB sud pos = valueFromSPSection sud pos (blockPositions pos)
 
+-- | Returns the value of a single position in a section
 valueFromSPSection :: Sudoku -> Position -> [Position] -> Value
 valueFromSPSection sud pos secPos = case getSinglePosition sud pos secPos of
                                         [x] -> Filled x
                                         _ -> error "Not a single position"
 
-
-
+-- | Returns the value of a single candidate in a cell
 valueFromSC :: Sudoku -> Position -> Value
 valueFromSC sud pos = case candidates of
                         [x] -> Filled x
@@ -94,7 +125,7 @@ valueFromLFCSection sec = case list' of
 valueFromCL :: Sudoku -> Position -> Value
 valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of 
                         as -> Note $ map (\([l],v) -> Line l v) as
-                        _ -> error "Not a single candidate"
+                        -- _ -> error "Not a single candidate" -- Overlapping pattern, might need to change this if it is ia problem
     where 
         candidates = getCandidates sud pos
         lines = [(lineBlock sud pos l, l) | l <- candidates, lineBlock sud pos l /= []]
@@ -137,6 +168,9 @@ testStep sud (SinglePositionRow p) = lemmaSinglePositionRow sud p
 testStep sud (SinglePositionColumn p) = lemmaSinglePositionColumn sud p
 testStep sud (SinglePositionBlock p) = lemmaSinglePositionBlock sud p
 testStep sud (CandidateLine p) = lemmaCandidateLine sud p
+testStep sud (NakedPairRow p) = lemmaNakedPairRow sud p
+testStep sud (NakedPairColumn p) = lemmaNakedPairColumn sud p
+testStep sud (NakedPairBlock p) = lemmaNakedPairBlock sud p
 testStep sud _ = error "lemma not implemented"
 
 
