@@ -3,6 +3,7 @@ module Solver where
 import Sudoku
 import SudokuLogic
 import Sudokus
+import Optimizer
 import Data.List
 
 
@@ -46,11 +47,11 @@ generateSolution sud = case next of
         next = nextStep sud steps
 
 placeValueFromStep :: Sudoku -> Step -> Sudoku
-placeValueFromStep sud (LastFreeCellBlock p) = fillCell sud p (valueFromLFCB sud p)
-placeValueFromStep sud (LastFreeCellRow p) = fillCell sud p (valueFromLFCR sud p)
-placeValueFromStep sud (LastFreeCellCollumn p) = fillCell sud p (valueFromLFCC sud p)
-placeValueFromStep sud (SingleCandidate p) = fillCell sud p (valueFromSC sud p)
-placeValueFromStep sud (SinglePositionRow p) = fillCell sud p (valueFromSPR sud p)
+placeValueFromStep sud (LastFreeCellBlock p)    = fillCell sud p (valueFromLFCB sud p)
+placeValueFromStep sud (LastFreeCellRow p)      = fillCell sud p (valueFromLFCR sud p)
+placeValueFromStep sud (LastFreeCellCollumn p)  = fillCell sud p (valueFromLFCC sud p)
+placeValueFromStep sud (SingleCandidate p)      = fillCell sud p (valueFromSC sud p)
+placeValueFromStep sud (SinglePositionRow p)    = fillCell sud p (valueFromSPR sud p)
 placeValueFromStep sud (SinglePositionColumn p) = fillCell sud p (valueFromSPC sud p)
 placeValueFromStep sud (SinglePositionBlock p) = fillCell sud p (valueFromSPB sud p)
 placeValueFromStep sud (CandidateLine p) = fillCell sud p (valueFromCL sud p)
@@ -138,14 +139,18 @@ nextStep sud [] = NOAVAILABLESTEPS
 nextStep sud (sf:sfs) = case tryStepsOnEmpty sud sf of
                             NOAVAILABLESTEPS -> nextStep sud sfs
                             x -> x
-
+      
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Step
-tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (emptyPositions sud)
+tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (finalOrderOfPosition sud)  --(emptyPositions sud)
 
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
 emptyPositions sud = [(r,c) | r <- [0..8], c <- [0..8], not (isFilled (valFromPos sud (r,c)))]
+
+propOrderPos sud = (finalOrderOfPosition sud \\ emptyPositions sud)
+
+--prop_getAllPos sud = all (\x -> elem x (emptyPositions sud)) (concat $ getAllPositionForValue sud)
 
 -- | Tries to apply a lemma/step to all position, 
 tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Step

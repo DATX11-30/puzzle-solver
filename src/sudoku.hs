@@ -98,6 +98,7 @@ columns = transpose
 blocks :: Sudoku ->  [Block]
 blocks sud = [[valFromPos sud (r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,6]]
 
+
 -- | Get the row that this position is included in
 rowFromPos :: Sudoku -> Position -> Row
 rowFromPos sud (row, col) = sud !! row
