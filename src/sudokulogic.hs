@@ -6,7 +6,7 @@ import Data.List
 import Control.Applicative (Alternative(empty))
 import Debug.Trace (trace)
 import Data.Type.Coercion (trans)
-import Test.QuickCheck (Positive(Positive))
+
 
 type Lemma = Sudoku -> Position -> Bool
 
@@ -52,6 +52,31 @@ lemmaSinglePositionRow sud pos = singlePositionSection sud pos (rowPositions pos
 -- | A lemma that checks if a value is the only possible value for a cell in a column
 lemmaSinglePositionColumn :: Sudoku -> Position -> Bool
 lemmaSinglePositionColumn sud pos = singlePositionSection sud pos (colPositions pos)
+
+lemmaNakedPairRow :: Sudoku -> Position -> Bool
+lemmaNakedPairRow sud pos = nakedPairSection sud pos (rowPositions pos)
+
+lemmaNakedPairColumn :: Sudoku -> Position -> Bool
+lemmaNakedPairColumn sud pos = nakedPairSection sud pos (colPositions pos)
+
+lemmaNakedPairBlock :: Sudoku -> Position -> Bool
+lemmaNakedPairBlock sud pos = nakedPairSection sud pos (blockPositions pos)
+
+nakedPairSection :: Sudoku -> Position -> [Position] -> Bool
+nakedPairSection sud pos sec = case getNakedPairInSection sud pos sec of
+                                    (_, []) -> False
+                                    _ -> True
+
+getNakedPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
+getNakedPairInSection sud pos sec =  case p of 
+                                        [] -> (pos, [])
+                                        _ -> (head p, posCandidates)
+    where
+        p = nakedPairs \\ [pos]
+        posCandidates = getCandidates sud pos
+        pairs = filter (\x -> length (getCandidates sud x) == 2) sec
+        nakedPairs = filter (\x -> posCandidates === getCandidates sud x) pairs
+
 
 -- | 
 lemmaCandidateLine :: Sudoku -> Position -> Bool
