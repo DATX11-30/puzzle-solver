@@ -6,7 +6,7 @@ import Data.List
 import Control.Applicative (Alternative(empty))
 import Debug.Trace (trace)
 import Data.Type.Coercion (trans)
-import Test.QuickCheck (Positive(Positive))
+
 
 type Lemma = Sudoku -> Position -> Bool
 
@@ -52,6 +52,32 @@ lemmaSinglePositionRow sud pos = singlePositionSection sud pos (rowPositions pos
 -- | A lemma that checks if a value is the only possible value for a cell in a column
 lemmaSinglePositionColumn :: Sudoku -> Position -> Bool
 lemmaSinglePositionColumn sud pos = singlePositionSection sud pos (colPositions pos)
+
+lemmaNakedPairRow :: Sudoku -> Position -> Bool
+lemmaNakedPairRow sud pos = nakedPairSection sud pos (rowPositions pos)
+
+lemmaNakedPairColumn :: Sudoku -> Position -> Bool
+lemmaNakedPairColumn sud pos = nakedPairSection sud pos (colPositions pos)
+
+lemmaNakedPairBlock :: Sudoku -> Position -> Bool
+lemmaNakedPairBlock sud pos = nakedPairSection sud pos (blockPositions pos)
+
+nakedPairSection :: Sudoku -> Position -> [Position] -> Bool
+nakedPairSection sud pos sec = case getNakedPairInSection sud pos sec of
+                                    (_, []) -> False
+                                    (p, vs)-> not (valFromPos sud pos == Note (map Candidate vs)
+                                              && valFromPos sud p == Note (map Candidate vs))
+
+getNakedPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
+getNakedPairInSection sud pos sec =  case p of
+                                        [] -> (pos, [])
+                                        _ -> (head p, posCandidates)
+    where
+        p = nakedPairs \\ [pos]
+        posCandidates = getCandidates sud pos
+        pairs = filter (\x -> length (getCandidates sud x) == 2 && not (isFilled (valFromPos sud x))) sec
+        nakedPairs = filter (\x -> posCandidates === getCandidates sud x) pairs
+
 
 -- | 
 lemmaCandidateLine :: Sudoku -> Position -> Bool
@@ -129,7 +155,12 @@ getCandidates s pos = candidates
         lineCands = noteLineCandidatesRow (row \\ (intersect row block)) ++ noteLineCandidatesCol (col \\ (intersect col block))
         sections = [row, col, block]
         occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
-        pairs = nub $ concatMap notePairs sections
+        pairs =  (nub $ concatMap notePairs sections) \\
+                    case valFromPos s pos of
+                        Note [Candidate a, Candidate b] -> [a,b]
+                        _                               -> []
+
+
         values = nub $ concat sections
 
 -- | Testes whether lemma singele candidate is valid
