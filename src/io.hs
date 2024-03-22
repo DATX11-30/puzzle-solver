@@ -2,7 +2,7 @@ module IO where
 import Solver
 import Sudokus
 import Sudoku
-import SudokuLogic (getCandidates)
+import SudokuLogic (getCandidates, getHiddenPairInSection)
 
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
@@ -85,3 +85,8 @@ getCandidatesIO :: FilePath -> Position -> IO [SudVal]
 getCandidatesIO filepath pos = do
         sud <- readSudoku filepath
         return $ getCandidates sud pos
+
+testHiddenPairs :: FilePath -> Position -> [Step] -> IO ()
+testHiddenPairs filepath pos steps = do
+        sud <- readSudoku filepath
+        print $ getHiddenPairInSection (applySolution sud steps) pos (blockPositions pos)

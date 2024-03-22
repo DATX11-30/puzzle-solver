@@ -6,6 +6,8 @@ import Data.List
 import Control.Applicative (Alternative(empty))
 import Debug.Trace (trace)
 import Data.Type.Coercion (trans)
+import Data.Maybe
+import Test.QuickCheck hiding ((===))
 
 
 type Lemma = Sudoku -> Position -> Bool
@@ -62,11 +64,27 @@ lemmaNakedPairColumn sud pos = nakedPairSection sud pos (colPositions pos)
 lemmaNakedPairBlock :: Sudoku -> Position -> Bool
 lemmaNakedPairBlock sud pos = nakedPairSection sud pos (blockPositions pos)
 
+lemmaHiddenPairRow :: Sudoku -> Position -> Bool
+lemmaHiddenPairRow sud pos = hiddenPairSection sud pos (rowPositions pos)
+
+lemmaHiddenPairColumn :: Sudoku -> Position -> Bool
+lemmaHiddenPairColumn sud pos = hiddenPairSection sud pos (colPositions pos)
+
+lemmaHiddenPairBlock :: Sudoku -> Position -> Bool
+lemmaHiddenPairBlock sud pos = hiddenPairSection sud pos (blockPositions pos)
+
 nakedPairSection :: Sudoku -> Position -> [Position] -> Bool
 nakedPairSection sud pos sec = case getNakedPairInSection sud pos sec of
                                     (_, []) -> False
                                     (p, vs)-> not (valFromPos sud pos == Note (map Candidate vs)
                                               && valFromPos sud p == Note (map Candidate vs))
+
+hiddenPairSection :: Sudoku -> Position -> [Position] -> Bool
+hiddenPairSection sud pos sec = case getHiddenPairInSection sud pos sec of
+                                    (_, []) -> False
+                                    (p, vs) -> not (valFromPos sud pos == Note (map Candidate vs)
+                                              && valFromPos sud p == Note (map Candidate vs))
+
 
 getNakedPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
 getNakedPairInSection sud pos sec =  case p of
@@ -78,7 +96,21 @@ getNakedPairInSection sud pos sec =  case p of
         pairs = filter (\x -> length (getCandidates sud x) == 2 && not (isFilled (valFromPos sud x))) sec
         nakedPairs = filter (\x -> posCandidates === getCandidates sud x) pairs
 
+getHiddenPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
+getHiddenPairInSection sud pos sec = case m of
+                                [p] -> (p, getMathcingCandidates sud pos p)
+                                _ -> (pos, [])
+    where
+        s = filter (\x -> not (isFilled $ valFromPos sud x)) sec \\ [pos]
+        m = filter (\x -> length ( getMathcingCandidates sud pos x) == 2
+            &&  all ( `notElem` concatMap (getCandidates sud) (s \\ [x])) (getMathcingCandidates sud pos x)) s
 
+
+getMathcingCandidates :: Sudoku -> Position -> Position -> [SudVal]
+getMathcingCandidates sud p1 p2 = p1Cand `intersect` p2Cand
+    where
+        p1Cand = getCandidates sud p1
+        p2Cand = getCandidates sud p2
 -- | 
 lemmaCandidateLine :: Sudoku -> Position -> Bool
 lemmaCandidateLine sud pos = case concat lines of
