@@ -74,7 +74,7 @@ showSolvedSudokuFromFile filepath = do
 generateSolutionFromFile :: FilePath -> IO ()
 generateSolutionFromFile filepath = do
         sud <- readSudoku filepath
-        print (generateSolution sud)
+        print (fst (generateSolution sud 0))
 
 applySolutionFromFile :: FilePath -> [Step] -> IO ()
 applySolutionFromFile filepath steps = do

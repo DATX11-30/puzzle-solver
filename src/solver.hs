@@ -5,8 +5,6 @@ import SudokuLogic
 import Sudokus
 import Optimizer
 import Data.List
-
-
 data Step =     LastFreeCellBlock Position      |
                 LastFreeCellRow Position        |
                 LastFreeCellCollumn Position    |
@@ -23,6 +21,9 @@ data Step =     LastFreeCellBlock Position      |
 
 type Solution = [Step]
 
+optimSteps :: Sudoku -> [Position -> Step]
+optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps
+
 steps :: [Position -> Step]
 steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, 
         SingleCandidate, 
@@ -32,19 +33,23 @@ steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn,
         ]
 
 solve :: Sudoku -> Sudoku
-solve sud = applySolution sud (generateSolution sud)
+solve sud = applySolution sud (fst (generateSolution sud 0))
+
+optimiseResult :: Sudoku -> Int
+optimiseResult sud = snd (generateSolution sud 0)
 
 -- | A solver for sudoku
 applySolution :: Sudoku -> Solution -> Sudoku
 applySolution = foldl placeValueFromStep
 
 -- | Generates a Solution
-generateSolution :: Sudoku -> Solution
-generateSolution sud = case next of
-                            NOAVAILABLESTEPS -> []
-                            _ -> next : generateSolution (placeValueFromStep sud next)
+generateSolution :: Sudoku -> Int -> (Solution,Int)
+generateSolution sud count = case fst next of
+                            NOAVAILABLESTEPS -> ([],count)
+                            _ -> (fst next : fst res ,snd res) 
     where
-        next = nextStep sud steps
+        next = nextStep sud (optimSteps sud) 0 --steps -- (optimSteps sud)
+        res = generateSolution (placeValueFromStep sud (fst next)) (count + snd next)
 
 placeValueFromStep :: Sudoku -> Step -> Sudoku
 placeValueFromStep sud (LastFreeCellBlock p)    = fillCell sud p (valueFromLFCB sud p)
@@ -134,15 +139,17 @@ valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of
 
 
 -- | next step in solving the sudoku
-nextStep :: Sudoku -> [Position -> Step] -> Step
-nextStep sud [] = NOAVAILABLESTEPS
-nextStep sud (sf:sfs) = case tryStepsOnEmpty sud sf of
-                            NOAVAILABLESTEPS -> nextStep sud sfs
-                            x -> x
+nextStep :: Sudoku -> [Position -> Step] -> Int -> (Step,Int)
+nextStep sud [] count = (NOAVAILABLESTEPS,count)
+nextStep sud (sf:sfs) count = case fst res of
+                            NOAVAILABLESTEPS -> nextStep sud sfs (count + snd res)
+                            x -> res
+        where
+                res = tryStepsOnEmpty sud sf count
       
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
-tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Step
-tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (finalOrderOfPosition sud)  --(emptyPositions sud)
+tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Int -> (Step,Int)
+tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (finalOrderOfPosition sud) count  --(emptyPositions sud) (finalOrderOfPosition sud)
 
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
@@ -153,10 +160,10 @@ propOrderPos sud = (finalOrderOfPosition sud \\ emptyPositions sud)
 --prop_getAllPos sud = all (\x -> elem x (emptyPositions sud)) (concat $ getAllPositionForValue sud)
 
 -- | Tries to apply a lemma/step to all position, 
-tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Step
-tryStepOnPositions sud _ [] = NOAVAILABLESTEPS
-tryStepOnPositions sud sf (p:ps) | testStep sud (sf p) = sf p
-                                 | otherwise = tryStepOnPositions sud sf ps
+tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Int -> (Step,Int)
+tryStepOnPositions sud _ [] count       = (NOAVAILABLESTEPS,count)
+tryStepOnPositions sud sf (p:ps) count  | testStep sud (sf p) = (sf p,count)
+                                        | otherwise = tryStepOnPositions sud sf ps (count+1)
 
 -- | Tests if a step is valid for the given sudoku
 testStep :: Sudoku -> Step -> Bool
