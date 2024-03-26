@@ -52,14 +52,14 @@ Functions for optimising the teqniques used when
 ------------}
 
 sudStepOrder :: [(Int,a)] ->[a]
-sudStepOrder list = reverse [snd x |x <-(sortOn fst list)] 
+sudStepOrder list = [snd x |x <-(sortOn fst list)] 
 
 stepWeight :: Sudoku -> [Int]
 stepWeight sud = [
     --{-LastFreeCellBlock     -} 1500 - (information !! 0) * 110,
     --{-LastFreeCellRow       -} 1500 - (information !! 1) * 110,
     --{-LastFreeCellCollumn   -} 1500 - (information !! 2) * 110,
-    {-SingleCandidate       -} 1500,
+    {-SingleCandidate       -} 1000,
     {-SingelPositionRow     -} 1500 - (information !! 3) * 120,
     {-SinglePositionColumn  -} 1500 - (information !! 4) * 120,
     {-SinglePositionBlock   -} 1500 - (information !! 5) * 120,
