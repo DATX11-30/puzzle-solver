@@ -98,14 +98,24 @@ getNakedPairInSection sud pos sec =  case p of
 
 getHiddenPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
 getHiddenPairInSection sud pos sec = case m of
-                                [p] -> (p, getMathcingCandidates sud pos p)
-                                _ -> (pos, [])
+                                [(p, cs)] -> (p, cs)
+                                [] -> (pos, [])
+                                _ -> error "Multiple hidden pairs"
     where
+
+        posCand = getCandidates sud pos
         s = filter (\x -> not (isFilled $ valFromPos sud x)) sec \\ [pos]
-        m = filter (\x -> length ( getMathcingCandidates sud pos x) == 2
-            &&  all ( `notElem` concatMap (getCandidates sud) (s \\ [x])) (getMathcingCandidates sud pos x)) s
+        cand = map (\x -> (getCandidates sud x, x)) s
+        a = filter (\(cs, p) -> fv posCand cs (map (getCandidates sud) s)) cand
+        m = map (\(cs, p) -> (p, f posCand cs (map (getCandidates sud) s))) a
 
+        fv :: [SudVal] -> [SudVal] -> [[SudVal]] -> Bool
+        fv me other secCand = length (f me other secCand) == 2
 
+        f :: [SudVal] -> [SudVal] -> [[SudVal]] -> [SudVal]
+        f me other secCand = filter (\x -> x `notElem` concat (secCand \\ [other])) (intersect me other)
+
+ 
 getMathcingCandidates :: Sudoku -> Position -> Position -> [SudVal]
 getMathcingCandidates sud p1 p2 = p1Cand `intersect` p2Cand
     where
@@ -180,19 +190,17 @@ prop_lastCell (row, col) = lemmaLastCellInRow (fillCell illegalSudoku (row, col)
 getCandidates :: Sudoku -> Position -> [SudVal]
 getCandidates s pos = candidates
     where
-        candidates = [x | x <- [One ..], Filled x `notElem` (nub occupiedVals)]
+        candidates = [x | x <- [One ..], Filled x `notElem` nub occupiedVals]
         row = rowFromPos s pos
         col = colFromPos s pos
         block = blockFromPos s pos
-        lineCands = noteLineCandidatesRow (row \\ (intersect row block)) ++ noteLineCandidatesCol (col \\ (intersect col block))
+        lineCands = noteLineCandidatesRow (row \\ intersect row block) ++ noteLineCandidatesCol (col \\ (intersect col block))
         sections = [row, col, block]
         occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
-        pairs =  (nub $ concatMap notePairs sections) \\
+        pairs =  nub (concatMap notePairs sections) \\
                     case valFromPos s pos of
                         Note [Candidate a, Candidate b] -> [a,b]
                         _                               -> []
-
-
         values = nub $ concat sections
 
 -- | Testes whether lemma singele candidate is valid
@@ -240,7 +248,7 @@ notePairs sec = nub pVals
 
 -- | Returns true if two lists are set-equal
 (===) :: Eq a => [a] -> [a] -> Bool
-(===) xs ys = null (xs \\ ys)
+(===) xs ys = null (xs \\ ys) && null (ys \\ xs)
 
 isCandidate :: Note -> Bool
 isCandidate (Candidate _) = True

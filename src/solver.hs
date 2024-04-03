@@ -29,10 +29,10 @@ type Solution = [Step]
 steps :: [Position -> Step]
 steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, 
         SingleCandidate,
-        SinglePositionRow, SinglePositionColumn, SinglePositionBlock,
-        --NakedPairBlock, NakedPairRow, NakedPairColumn,
-        HiddenPairBlock, HiddenPairRow, HiddenPairColumn
-        --CandidateLine
+        SinglePositionRow, SinglePositionColumn, SinglePositionBlock
+        ,NakedPairBlock, NakedPairRow, NakedPairColumn
+        ,HiddenPairBlock, HiddenPairRow, HiddenPairColumn
+        ,CandidateLine
         ]
 
 solve :: Sudoku -> Sudoku
