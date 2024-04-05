@@ -112,11 +112,25 @@ optimiseResultFromFile filepath = do
         print filepath
         let result = (optimiseResult sud)
         let sud' = applySolution sud (fst result)
-        showSudoku sud
-        showSudoku sud'
+        --showSudoku sud
+        --showSudoku sud'
+        --print (fst result)
         print (isSolved sud')
         print (snd result)
 
+optimiseResultFromFileToFile :: FilePath -> IO ()
+optimiseResultFromFileToFile filepath = do
+        sud <- readSudoku filepath
+        appendFile "./result.txt" (filepath ++ "\n")
+        let result = (generateSolution sud 0)
+        let sud' = applySolution sud (fst result)
+        appendFile "./result.txt" (show (snd result) ++ "\n")
+        return ()
+
+optimiseAllResultsInDirToFile :: FilePath -> IO ()
+optimiseAllResultsInDirToFile dir = do
+        files <- getAllSudokusInDir dir
+        mapM_ optimiseResultFromFileToFile files
 
 optimiseAllResultsInDir :: FilePath -> IO ()
 optimiseAllResultsInDir dir = do
