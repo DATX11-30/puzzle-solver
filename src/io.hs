@@ -108,13 +108,13 @@ countChecksFromFile :: FilePath -> IO ()
 countChecksFromFile filepath = do
         sud <- readSudoku filepath
         print filepath
-        let result = (checksCount sud)
+        let result = (generateSolution sud 0)
         let sud' = applySolution sud (fst result)
         --showSudoku sud
         --showSudoku sud'
         --print (fst result)
         print (isSolved sud')
-        print (result)
+        print (snd result)
 
 countChecksFromFileToFile :: FilePath -> IO ()
 countChecksFromFileToFile filepath = do

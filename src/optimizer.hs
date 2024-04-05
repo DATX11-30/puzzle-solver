@@ -9,10 +9,10 @@ import Data.List
 {----------------------
 Functions for prioritating which positions to check first
 ----------------------}
--- Optim    MFB     LFB     EmptyPos
--- s1       1910    1889    2089
--- s2       344     302     501
--- s3       36753   36951   47583
+-- Optim    MFB     LFB     EmptyPos    MFB + Weight v.1 
+-- s1       1910    1889    2089            error
+-- s2       344     302     501             263 
+-- s3       36753   36951   47583           252149
 
 -- | Creating the final list of positions by order of most used number and most filled block
 finalOrderOfPosition :: Sudoku -> [Position]
@@ -63,13 +63,13 @@ stepWeight sud = [
     --{-LastFreeCellRow       -} 1500 - (information !! 1) * 110,
     --{-LastFreeCellCollumn   -} 1500 - (information !! 2) * 110,
     {-SingleCandidate       -} 1000,
-    --{-SingelPositionRow     -} 1500 - (information !! 3) * 120,
-    --{-SinglePositionColumn  -} 1500 - (information !! 4) * 120,
-    --{-SinglePositionBlock   -} 1500 - (information !! 5) * 120,
+    {-SingelPositionRow     -} 1500 - (information !! 3) * 120,
+    {-SinglePositionColumn  -} 1500 - (information !! 4) * 120,
+    {-SinglePositionBlock   -} 1500 - (information !! 5) * 120,
     
-    {-SingelPositionRow     -} if information !! 1 == 8 then 1 else 1500 - (information !! 3) * 120,
-    {-SinglePositionColumn  -} if information !! 2 == 8 then 1 else 1500 - (information !! 4) * 120,
-    {-SinglePositionBlock   -} if information !! 0 == 8 then 1 else 1500 - (information !! 5) * 120,
+    --{-SingelPositionRow     -} if information !! 1 == 8 then 3000 else 1500 - (information !! 3) * 120,
+    --{-SinglePositionColumn  -} if information !! 2 == 8 then 2000 else 1500 - (information !! 4) * 120,
+    --{-SinglePositionBlock   -} if information !! 0 == 8 then 1001 else 1500 - (information !! 5) * 120,
     {-CandidateLine         -} 16000,
     {-NakedPairRow          -} 2000000 - (information !! 6) * (information !! 4) * 5,
     {-NakedPairColumn       -} 2000000 - (information !! 6) * (information !! 5) * 5,
