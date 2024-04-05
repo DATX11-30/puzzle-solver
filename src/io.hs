@@ -110,13 +110,12 @@ optimiseResultFromFile :: FilePath -> IO ()
 optimiseResultFromFile filepath = do
         sud <- readSudoku filepath
         print filepath
-        let result = (optimiseResult sud)
+        let result = (checksCount sud)
         let sud' = applySolution sud (fst result)
         showSudoku sud
         showSudoku sud'
         print (isSolved sud')
         print (snd result)
-
 
 optimiseAllResultsInDir :: FilePath -> IO ()
 optimiseAllResultsInDir dir = do
