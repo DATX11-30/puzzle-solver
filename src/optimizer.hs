@@ -51,9 +51,12 @@ findOccuranceOfNumber val sud = length (filter (\x -> x == val) sudlist)
 Functions for optimising the teqniques used when
 ------------}
 
+-- |Sorts a list of tupels by the first value in the tuple
 sudStepOrder :: [(Int,a)] ->[a]
 sudStepOrder list = [snd x |x <-(sortOn fst list)] 
 
+
+-- | Creates a list of weight to utilize when sorting the steps to test first
 stepWeight :: Sudoku -> [Int]
 stepWeight sud = [
     --{-LastFreeCellBlock     -} 1500 - (information !! 0) * 110,
@@ -81,7 +84,7 @@ stepWeight sud = [
     deriving (Eq,Show) -- | Then add more step types
 -}
 
-
+-- | Function that creates a list of values from a sudoku to be utilised in determening the weights
 informationForWeight :: Sudoku -> [Int]
 informationForWeight sud = [maxBlocks,maxRows,maxCols,maxRowsWNotes,maxColsWNotes,maxBlocksWNotes,maxFilledNumber]
     where
@@ -98,20 +101,25 @@ informationForWeight sud = [maxBlocks,maxRows,maxCols,maxRowsWNotes,maxColsWNote
 mostFilledSection :: [Section] -> Int
 mostFilledSection sections = maximum $ filter (\x-> x /= 9) (filledInSections sections)
 
+-- | Takes a list of section and return how filled in each section not counting notes
 filledInSections :: [Section] -> [Int]
-filledInSections sections = (map filledSection sections) ++ [0]
+filledInSections sections = (map filledSection sections)
 
+-- | Returns how filled a section is not counting notes as filled
 filledSection :: Section -> Int
 filledSection [] = 0
 filledSection ((Filled _):sp) = 1 + filledSection sp
 filledSection (_:sp) = 0 + filledSection sp
 
+-- | Returns how filled the most non full section is
 mostFilledSectionWNotes :: [Section] -> Int
-mostFilledSectionWNotes sections = maximum $ filter (\x-> x /= 9) (filledInSectionsWNotes sections)
+mostFilledSectionWNotes sections = maximum $ filter (\x-> x /= 9) (filledInSectionsWNotes sections ++ [0])
 
+-- | Takes a list of section and return how filled in each section is counting notes
 filledInSectionsWNotes :: [Section] -> [Int]
 filledInSectionsWNotes sections = (map filledSectionWNotes sections) ++ [0]
 
+-- | Returns how filled a section is counting notes as filled
 filledSectionWNotes :: Section -> Int
 filledSectionWNotes [] = 0
 filledSectionWNotes ((Empty):sp) = 0 + filledSection sp

@@ -24,9 +24,11 @@ data Step =     LastFreeCellBlock Position      |
 
 type Solution = [Step]
 
+-- | Takes a sudoku and returns a reorginised list of steps
 optimSteps :: Sudoku -> [Position -> Step]
 optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps
 
+-- | List of every step the solver can try
 steps :: [Position -> Step]
 steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, 
         SingleCandidate,
@@ -36,8 +38,13 @@ steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn,
         ,CandidateLine
         ]
 
+-- | Takes a sudoku and returns a solved sudoku
 solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (fst (generateSolution sud 0))
+
+-- | Returns how many check it took to reach a solution to a sudoku
+checksCount :: Sudoku -> (Solution, Int)
+checksCount sud = (generateSolution sud 0)
 
 -- | A solver for sudoku
 applySolution :: Sudoku -> Solution -> Sudoku
@@ -51,7 +58,7 @@ generateSolution sud count = case fst next of
     where
         next = nextStep sud (optimSteps sud) 0 --steps -- (optimSteps sud)
         res = generateSolution (placeValueFromStep sud (fst next)) (count + snd next)
-
+ 
 placeValueFromStep :: Sudoku -> Step -> Sudoku
 placeValueFromStep sud (LastFreeCellBlock p)    = fillCell sud p (valueFromLFCB sud p)
 placeValueFromStep sud (LastFreeCellRow p)      = fillCell sud p (valueFromLFCR sud p)
@@ -213,6 +220,6 @@ testStep sud (HiddenPairBlock p) = lemmaHiddenPairBlock sud p
 testStep sud _ = error "lemma not implemented"
 
 
-
+-- | Returns True if a sudoku is full otherwise return False 
 isSolved :: Sudoku -> Bool
 isSolved sud = all isFilled (concat sud)
