@@ -43,8 +43,8 @@ solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (fst (generateSolution sud 0))
 
 -- | Returns how many check it took to reach a solution to a sudoku
-checksCount :: Sudoku -> (Solution, Int)
-checksCount sud = (generateSolution sud 0)
+checksCount :: Sudoku -> (Int)
+checksCount sud =snd (generateSolution sud 0)
 
 -- | A solver for sudoku
 applySolution :: Sudoku -> Solution -> Sudoku

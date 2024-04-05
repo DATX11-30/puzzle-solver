@@ -114,7 +114,7 @@ countChecksFromFile filepath = do
         --showSudoku sud'
         --print (fst result)
         print (isSolved sud')
-        print (snd result)
+        print (result)
 
 countChecksFromFileToFile :: FilePath -> IO ()
 countChecksFromFileToFile filepath = do
