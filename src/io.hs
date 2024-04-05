@@ -106,8 +106,8 @@ showAllSudokusInDir dir = do
         files <- getAllSudokusInDir dir
         mapM_ showSudokuFromFile files
 
-optimiseResultFromFile :: FilePath -> IO ()
-optimiseResultFromFile filepath = do
+countChecksFromFile :: FilePath -> IO ()
+countChecksFromFile filepath = do
         sud <- readSudoku filepath
         print filepath
         let result = (checksCount sud)
@@ -118,8 +118,8 @@ optimiseResultFromFile filepath = do
         print (isSolved sud')
         print (snd result)
 
-optimiseResultFromFileToFile :: FilePath -> IO ()
-optimiseResultFromFileToFile filepath = do
+countChecksFromFileToFile :: FilePath -> IO ()
+countChecksFromFileToFile filepath = do
         sud <- readSudoku filepath
         appendFile "./result.txt" (filepath ++ "\n")
         let result = (generateSolution sud 0)
@@ -127,13 +127,13 @@ optimiseResultFromFileToFile filepath = do
         appendFile "./result.txt" (show (snd result) ++ "\n")
         return ()
 
-optimiseAllResultsInDirToFile :: FilePath -> IO ()
-optimiseAllResultsInDirToFile dir = do
+countChecksForAllInDirToFile :: FilePath -> IO ()
+countChecksForAllInDirToFile dir = do
         files <- getAllSudokusInDir dir
-        mapM_ optimiseResultFromFileToFile files
+        mapM_ countChecksFromFileToFile files
 
-optimiseAllResultsInDir :: FilePath -> IO ()
-optimiseAllResultsInDir dir = do
+countChecksForAllInDir :: FilePath -> IO ()
+countChecksForAllInDir dir = do
         files <- getAllSudokusInDir dir
-        mapM_ optimiseResultFromFile files
+        mapM_ countChecksFromFile files
 
