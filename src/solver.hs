@@ -18,6 +18,9 @@ data Step =     LastFreeCellBlock Position      |
                 NakedPairRow Position           |
                 NakedPairColumn Position        |
                 NakedPairBlock Position         |
+                HiddenPairRow Position          |
+                HiddenPairColumn Position       |
+                HiddenPairBlock Position        |
                 NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
 
@@ -25,10 +28,11 @@ type Solution = [Step]
 
 steps :: [Position -> Step]
 steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn, 
-        SingleCandidate, 
-        SinglePositionRow, SinglePositionColumn, SinglePositionBlock,
-        NakedPairBlock, NakedPairRow, NakedPairColumn,
-        CandidateLine
+        SingleCandidate,
+        SinglePositionRow, SinglePositionColumn, SinglePositionBlock
+        ,NakedPairBlock, NakedPairRow, NakedPairColumn
+        ,HiddenPairBlock, HiddenPairRow, HiddenPairColumn
+        ,CandidateLine
         ]
 
 solve :: Sudoku -> Sudoku
@@ -58,7 +62,30 @@ placeValueFromStep sud (CandidateLine p) = fillCell sud p (valueFromCL sud p)
 placeValueFromStep sud (NakedPairRow p) = valueFromNPR sud p
 placeValueFromStep sud (NakedPairColumn p) = valueFromNPC sud p
 placeValueFromStep sud (NakedPairBlock p) = valueFromNPB sud p
+placeValueFromStep sud (HiddenPairRow p) = valueFromHPR sud p
+placeValueFromStep sud (HiddenPairColumn p) = valueFromHPC sud p
+placeValueFromStep sud (HiddenPairBlock p) = valueFromHPB sud p
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
+
+-- | Hidden pair row
+valueFromHPR :: Sudoku -> Position -> Sudoku
+valueFromHPR sud pos = valueFromHPSection sud pos (rowPositions pos)
+
+-- | Hidden pair column
+valueFromHPC :: Sudoku -> Position -> Sudoku
+valueFromHPC sud pos = valueFromHPSection sud pos (colPositions pos)
+
+-- | Hidden pair block
+valueFromHPB :: Sudoku -> Position -> Sudoku
+valueFromHPB sud pos = valueFromHPSection sud pos (blockPositions pos)
+
+-- | Returns a soduku with both values from a hidden pair filled in i a section
+valueFromHPSection :: Sudoku -> Position -> [Position] -> Sudoku
+valueFromHPSection sud pos secPos = case getHiddenPairInSection sud pos secPos of
+                                        (p, [v1, v2]) -> fillCell
+                                                        (fillCell sud p (Note [Candidate v1, Candidate v2]))
+                                                        pos (Note [Candidate v1, Candidate v2])
+                                        _ -> error "Not a naked pair"
 
 -- | Returns a soduku with both values from a naked pair filled in i a row
 valueFromNPR :: Sudoku -> Position -> Sudoku
@@ -75,8 +102,8 @@ valueFromNPB sud pos = valueFromNPSection sud pos (blockPositions pos)
 -- | Returns a soduku with both values from a naked pair filled in i a section
 valueFromNPSection :: Sudoku -> Position -> [Position] -> Sudoku
 valueFromNPSection sud pos secPos = case getNakedPairInSection sud pos secPos of
-                                        (p, v1:v2:[]) -> fillCell 
-                                                        (fillCell sud p (Note [Candidate v1, Candidate v2])) 
+                                        (p, v1:v2:[]) -> fillCell
+                                                        (fillCell sud p (Note [Candidate v1, Candidate v2]))
                                                         pos (Note [Candidate v1, Candidate v2])
                                         _ -> error "Not a naked pair"
 
@@ -106,15 +133,19 @@ valueFromSC sud pos = case candidates of
     where
         candidates = getCandidates sud pos
 
+-- | Last free cell row
 valueFromLFCR :: Sudoku -> Position -> Value
 valueFromLFCR sud pos = valueFromLFCSection (rowFromPos sud pos)
 
+-- | Last free cell collumn
 valueFromLFCC :: Sudoku -> Position -> Value
 valueFromLFCC sud pos = valueFromLFCSection (colFromPos sud pos)
 
+-- | Last free cell block
 valueFromLFCB :: Sudoku -> Position -> Value
 valueFromLFCB sud pos = valueFromLFCSection (blockFromPos sud pos)
 
+-- | Returns the value of the last free cell in a section
 valueFromLFCSection :: Section -> Value
 valueFromLFCSection sec = case list' of
                             [x] -> x
@@ -122,11 +153,12 @@ valueFromLFCSection sec = case list' of
     where
         list' = [Filled x | x <- [One ..]] \\ sec
 
+-- | Returns the value of a candidate line
 valueFromCL :: Sudoku -> Position -> Value
-valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of 
+valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of
                         as -> Note $ map (\([l],v) -> Line l v) as
                         -- _ -> error "Not a single candidate" -- Overlapping pattern, might need to change this if it is ia problem
-    where 
+    where
         candidates = getCandidates sud pos
         lines = [(lineBlock sud pos l, l) | l <- candidates, lineBlock sud pos l /= []]
 
@@ -139,7 +171,7 @@ nextStep sud [] = NOAVAILABLESTEPS
 nextStep sud (sf:sfs) = case tryStepsOnEmpty sud sf of
                             NOAVAILABLESTEPS -> nextStep sud sfs
                             x -> x
-      
+
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Step
 tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (finalOrderOfPosition sud)  --(emptyPositions sud)
@@ -171,6 +203,9 @@ testStep sud (CandidateLine p) = lemmaCandidateLine sud p
 testStep sud (NakedPairRow p) = lemmaNakedPairRow sud p
 testStep sud (NakedPairColumn p) = lemmaNakedPairColumn sud p
 testStep sud (NakedPairBlock p) = lemmaNakedPairBlock sud p
+testStep sud (HiddenPairRow p) = lemmaHiddenPairRow sud p
+testStep sud (HiddenPairColumn p) = lemmaHiddenPairColumn sud p
+testStep sud (HiddenPairBlock p) = lemmaHiddenPairBlock sud p
 testStep sud _ = error "lemma not implemented"
 
 
