@@ -52,7 +52,7 @@ generateSolution sud count = case fst next of
                             NOAVAILABLESTEPS -> ([],count)
                             _ -> (fst next : fst res ,snd res) 
     where
-        next = nextStep sud (optimSteps sud) 0 --steps -- (optimSteps sud)
+        next = nextStep sud (steps) 0 --steps -- (optimSteps sud)
         res = generateSolution (placeValueFromStep sud (fst next)) (count + snd next)
  
 placeValueFromStep :: Sudoku -> Step -> Sudoku
@@ -185,6 +185,6 @@ testStep sud (NakedPairBlock p) = lemmaNakedPairBlock sud p
 testStep sud _ = error "lemma not implemented"
 
 
--- | Returns True if a sudoku is full otherwise return False 
+-- | Returns True if a sudoku is full otherwise return 
 isSolved :: Sudoku -> Bool
 isSolved sud = all isFilled (concat sud)
