@@ -67,15 +67,19 @@ placeValueFromStep sud (HiddenPairColumn p) = valueFromHPC sud p
 placeValueFromStep sud (HiddenPairBlock p) = valueFromHPB sud p
 placeValueFromStep sud _ = error "Not implemeted this lemma yet :("
 
+-- | Hidden pair row
 valueFromHPR :: Sudoku -> Position -> Sudoku
 valueFromHPR sud pos = valueFromHPSection sud pos (rowPositions pos)
 
+-- | Hidden pair column
 valueFromHPC :: Sudoku -> Position -> Sudoku
 valueFromHPC sud pos = valueFromHPSection sud pos (colPositions pos)
 
+-- | Hidden pair block
 valueFromHPB :: Sudoku -> Position -> Sudoku
 valueFromHPB sud pos = valueFromHPSection sud pos (blockPositions pos)
 
+-- | Returns a soduku with both values from a hidden pair filled in i a section
 valueFromHPSection :: Sudoku -> Position -> [Position] -> Sudoku
 valueFromHPSection sud pos secPos = case getHiddenPairInSection sud pos secPos of
                                         (p, [v1, v2]) -> fillCell
@@ -129,15 +133,19 @@ valueFromSC sud pos = case candidates of
     where
         candidates = getCandidates sud pos
 
+-- | Last free cell row
 valueFromLFCR :: Sudoku -> Position -> Value
 valueFromLFCR sud pos = valueFromLFCSection (rowFromPos sud pos)
 
+-- | Last free cell collumn
 valueFromLFCC :: Sudoku -> Position -> Value
 valueFromLFCC sud pos = valueFromLFCSection (colFromPos sud pos)
 
+-- | Last free cell block
 valueFromLFCB :: Sudoku -> Position -> Value
 valueFromLFCB sud pos = valueFromLFCSection (blockFromPos sud pos)
 
+-- | Returns the value of the last free cell in a section
 valueFromLFCSection :: Section -> Value
 valueFromLFCSection sec = case list' of
                             [x] -> x
@@ -145,6 +153,7 @@ valueFromLFCSection sec = case list' of
     where
         list' = [Filled x | x <- [One ..]] \\ sec
 
+-- | Returns the value of a candidate line
 valueFromCL :: Sudoku -> Position -> Value
 valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of
                         as -> Note $ map (\([l],v) -> Line l v) as
