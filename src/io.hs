@@ -141,3 +141,4 @@ testHiddenPairs :: FilePath -> Position -> [Step] -> IO ()
 testHiddenPairs filepath pos steps = do
         sud <- readSudoku filepath
         print $ getHiddenPairInSection (applySolution sud steps) pos (blockPositions pos)
+
