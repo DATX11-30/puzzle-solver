@@ -39,8 +39,8 @@ steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn,
 solve :: Sudoku -> Sudoku
 solve sud = applySolution sud (fst (generateSolution sud 0))
 
-optimiseResult :: Sudoku -> Int
-optimiseResult sud = snd (generateSolution sud 0)
+optimiseResult :: Sudoku -> (Solution, Int)
+optimiseResult sud = (generateSolution sud 0)
 
 -- | A solver for sudoku
 applySolution :: Sudoku -> Solution -> Sudoku
@@ -217,3 +217,5 @@ testStep sud _ = error "lemma not implemented"
 
 
 
+isSolved :: Sudoku -> Bool
+isSolved sud = all isFilled (concat sud)
