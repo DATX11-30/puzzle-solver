@@ -118,7 +118,6 @@ optimiseResultFromFile filepath = do
         print (isSolved sud')
         print (snd result)
 
-<<<<<<< HEAD
 optimiseResultFromFileToFile :: FilePath -> IO ()
 optimiseResultFromFileToFile filepath = do
         sud <- readSudoku filepath
@@ -133,8 +132,6 @@ optimiseAllResultsInDirToFile dir = do
         files <- getAllSudokusInDir dir
         mapM_ optimiseResultFromFileToFile files
 
-=======
->>>>>>> 297ce3a4667ea4754c6ce23e5658d411cab1c8ef
 optimiseAllResultsInDir :: FilePath -> IO ()
 optimiseAllResultsInDir dir = do
         files <- getAllSudokusInDir dir
