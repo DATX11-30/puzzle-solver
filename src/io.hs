@@ -3,6 +3,8 @@ import Solver
 import Sudokus
 import Sudoku
 import SudokuLogic (getCandidates, getHiddenPairInSection)
+import System.Directory
+import Data.List
 
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
@@ -74,7 +76,7 @@ showSolvedSudokuFromFile filepath = do
 generateSolutionFromFile :: FilePath -> IO ()
 generateSolutionFromFile filepath = do
         sud <- readSudoku filepath
-        print (generateSolution sud)
+        print (fst (generateSolution sud 0))
 
 applySolutionFromFile :: FilePath -> [Step] -> IO ()
 applySolutionFromFile filepath steps = do
@@ -86,7 +88,55 @@ getCandidatesIO filepath pos = do
         sud <- readSudoku filepath
         return $ getCandidates sud pos
 
+getAllSudokusInDir :: FilePath -> IO [FilePath]
+getAllSudokusInDir dir = do
+        files <- listDirectory dir
+        -- Filter out .DS_Store files
+        files <- return $ filter (/= ".DS_Store") files
+        -- Filter out all Directories
+        files <- return $ filter (\x -> (elem '.' x)) files
+        -- Sort alphabetically 
+        files <- return $ sortOn (\x -> x) files
+        return $ map (\x -> dir ++ "/" ++ x) files
+
+showAllSudokusInDir :: FilePath -> IO ()
+showAllSudokusInDir dir = do
+        files <- getAllSudokusInDir dir
+        mapM_ showSudokuFromFile files
+
+countChecksFromFile :: FilePath -> IO ()
+countChecksFromFile filepath = do
+        sud <- readSudoku filepath
+        print filepath
+        let result = (checksCount sud)
+        let sud' = applySolution sud (fst result)
+        --showSudoku sud
+        --showSudoku sud'
+        --print (fst result)
+        print (isSolved sud')
+        print (snd result)
+
+countChecksFromFileToFile :: FilePath -> IO ()
+countChecksFromFileToFile filepath = do
+        sud <- readSudoku filepath
+        appendFile "./result.txt" (filepath ++ "\n")
+        let result = (generateSolution sud 0)
+        let sud' = applySolution sud (fst result)
+        appendFile "./result.txt" (show (snd result) ++ "\n")
+        return ()
+
+countChecksForAllInDirToFile :: FilePath -> IO ()
+countChecksForAllInDirToFile dir = do
+        files <- getAllSudokusInDir dir
+        mapM_ countChecksFromFileToFile files
+
+countChecksForAllInDir :: FilePath -> IO ()
+countChecksForAllInDir dir = do
+        files <- getAllSudokusInDir dir
+        mapM_ countChecksFromFile files
+
 testHiddenPairs :: FilePath -> Position -> [Step] -> IO ()
 testHiddenPairs filepath pos steps = do
         sud <- readSudoku filepath
         print $ getHiddenPairInSection (applySolution sud steps) pos (blockPositions pos)
+
