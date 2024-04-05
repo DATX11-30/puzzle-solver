@@ -3,6 +3,9 @@ import Solver
 import Sudokus
 import Sudoku
 import SudokuLogic (getCandidates)
+import System.Directory
+import Data.List
+
 
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
@@ -85,3 +88,38 @@ getCandidatesIO :: FilePath -> Position -> IO [SudVal]
 getCandidatesIO filepath pos = do
         sud <- readSudoku filepath
         return $ getCandidates sud pos
+
+
+getAllSudokusInDir :: FilePath -> IO [FilePath]
+getAllSudokusInDir dir = do
+        files <- listDirectory dir
+        -- Filter out .DS_Store files
+        files <- return $ filter (/= ".DS_Store") files
+        -- Filter out all Directories
+        files <- return $ filter (\x -> (elem '.' x)) files
+        -- Sort alphabetically 
+        files <- return $ sortOn (\x -> x) files
+        return $ map (\x -> dir ++ "/" ++ x) files
+
+showAllSudokusInDir :: FilePath -> IO ()
+showAllSudokusInDir dir = do
+        files <- getAllSudokusInDir dir
+        mapM_ showSudokuFromFile files
+
+optimiseResultFromFile :: FilePath -> IO ()
+optimiseResultFromFile filepath = do
+        sud <- readSudoku filepath
+        print filepath
+        let result = (optimiseResult sud)
+        let sud' = applySolution sud (fst result)
+        showSudoku sud
+        showSudoku sud'
+        print (isSolved sud')
+        print (snd result)
+
+
+optimiseAllResultsInDir :: FilePath -> IO ()
+optimiseAllResultsInDir dir = do
+        files <- getAllSudokusInDir dir
+        mapM_ optimiseResultFromFile files
+
