@@ -70,7 +70,10 @@ stepWeight sud = [
     {-NakedPairRow          -} 2000000 - (information !! 6) * (information !! 4) * 5,
     {-NakedPairColumn       -} 2000000 - (information !! 6) * (information !! 5) * 5,
     {-NakedPairBlock        -} 2000000 - (information !! 6) * (information !! 3) * 5,
-    {-NOAVAILABLESTEPS      -} 300000
+    {-HiddenPairBlock       -} 2000000, 
+    {-HiddenPairRow         -} 2000001,
+    {-HiddenPairColumn      -} 2000002,
+    {-NOAVAILABLESTEPS      -} 3000000000
     ]
     where
         information = informationForWeight sud
