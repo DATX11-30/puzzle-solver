@@ -2,10 +2,9 @@ module IO where
 import Solver
 import Sudokus
 import Sudoku
-import SudokuLogic (getCandidates)
+import SudokuLogic (getCandidates, getHiddenPairInSection)
 import System.Directory
 import Data.List
-
 
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
@@ -89,7 +88,6 @@ getCandidatesIO filepath pos = do
         sud <- readSudoku filepath
         return $ getCandidates sud pos
 
-
 getAllSudokusInDir :: FilePath -> IO [FilePath]
 getAllSudokusInDir dir = do
         files <- listDirectory dir
@@ -136,4 +134,9 @@ countChecksForAllInDir :: FilePath -> IO ()
 countChecksForAllInDir dir = do
         files <- getAllSudokusInDir dir
         mapM_ countChecksFromFile files
+
+testHiddenPairs :: FilePath -> Position -> [Step] -> IO ()
+testHiddenPairs filepath pos steps = do
+        sud <- readSudoku filepath
+        print $ getHiddenPairInSection (applySolution sud steps) pos (blockPositions pos)
 

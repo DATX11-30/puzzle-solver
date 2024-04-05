@@ -6,6 +6,8 @@ import Data.List
 import Control.Applicative (Alternative(empty))
 import Debug.Trace (trace)
 import Data.Type.Coercion (trans)
+import Data.Maybe
+import Test.QuickCheck hiding ((===))
 
 
 type Lemma = Sudoku -> Position -> Bool
@@ -53,6 +55,7 @@ lemmaSinglePositionRow sud pos = singlePositionSection sud pos (rowPositions pos
 lemmaSinglePositionColumn :: Sudoku -> Position -> Bool
 lemmaSinglePositionColumn sud pos = singlePositionSection sud pos (colPositions pos)
 
+
 lemmaNakedPairRow :: Sudoku -> Position -> Bool
 lemmaNakedPairRow sud pos = nakedPairSection sud pos (rowPositions pos)
 
@@ -62,24 +65,77 @@ lemmaNakedPairColumn sud pos = nakedPairSection sud pos (colPositions pos)
 lemmaNakedPairBlock :: Sudoku -> Position -> Bool
 lemmaNakedPairBlock sud pos = nakedPairSection sud pos (blockPositions pos)
 
+lemmaHiddenPairRow :: Sudoku -> Position -> Bool
+lemmaHiddenPairRow sud pos = hiddenPairSection sud pos (rowPositions pos)
+
+lemmaHiddenPairColumn :: Sudoku -> Position -> Bool
+lemmaHiddenPairColumn sud pos = hiddenPairSection sud pos (colPositions pos)
+
+lemmaHiddenPairBlock :: Sudoku -> Position -> Bool
+lemmaHiddenPairBlock sud pos = hiddenPairSection sud pos (blockPositions pos)
+
+
 nakedPairSection :: Sudoku -> Position -> [Position] -> Bool
 nakedPairSection sud pos sec = case getNakedPairInSection sud pos sec of
                                     (_, []) -> False
                                     (p, vs)-> not (valFromPos sud pos == Note (map Candidate vs)
                                               && valFromPos sud p == Note (map Candidate vs))
 
+hiddenPairSection :: Sudoku -> Position -> [Position] -> Bool
+hiddenPairSection sud pos sec = case getHiddenPairInSection sud pos sec of
+                                    (_, []) -> False
+                                    (p, vs) -> not (valFromPos sud pos == Note (map Candidate vs)
+                                              && valFromPos sud p == Note (map Candidate vs))
+
+-- | Returns the position of the other part of the pair and the value of the pair in the form (Position, [SudVal]) 
+-- The corresponding pair is with the inserted position. 
+-- If no pair is found, then return the inserted position and an empty list 
 getNakedPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
 getNakedPairInSection sud pos sec =  case p of
                                         [] -> (pos, [])
                                         _ -> (head p, posCandidates)
     where
-        p = nakedPairs \\ [pos]
+        -- The candidates of the inserted position
         posCandidates = getCandidates sud pos
+        -- The nonfilled positions in the section which also only has two candidates
         pairs = filter (\x -> length (getCandidates sud x) == 2 && not (isFilled (valFromPos sud x))) sec
+        -- The positions with matching candidates with the inserted position, i.e. the pairs
         nakedPairs = filter (\x -> posCandidates === getCandidates sud x) pairs
+        -- The list of pairs with the original position removed.
+        p = nakedPairs \\ [pos]
 
 
--- | 
+
+-- | Returns the position of the other part of the pair and the value of the pair in the form (Position, [SudVal]) 
+-- The corresponding pair is with the inserted position. 
+-- If no pair is found, then return the inserted position and an empty list 
+getHiddenPairInSection :: Sudoku -> Position -> [Position] -> (Position, [SudVal])
+getHiddenPairInSection sud pos sec = case m of
+                                [(p, cs)] -> (p, cs)
+                                [] -> (pos, [])
+                                _ -> error "Multiple hidden pairs"
+    where
+        -- The candidates of the inserted position
+        posCand = getCandidates sud pos
+        -- The empty position in the section that are not the inserted position
+        s = filter (\x -> not (isFilled $ valFromPos sud x)) sec \\ [pos]
+        -- The candidates of the empty positions in the type [([candidates], position)]
+        cand = map (\x -> (getCandidates sud x, x)) s
+
+        -- The postions that have mathing candidates with the origianal position but not any other
+        a = filter (\(cs, p) -> fv posCand cs (map (getCandidates sud) s)) cand
+
+        -- The positions with pairs i.e. the ones with only two mathing candidates 
+        m = map (\(cs, p) -> (p, f posCand cs (map (getCandidates sud) s))) a
+
+        fv :: [SudVal] -> [SudVal] -> [[SudVal]] -> Bool
+        fv me other secCand = length (f me other secCand) == 2
+
+        -- | Returns the values that are both in me and other but not in the rest of the section
+        f :: [SudVal] -> [SudVal] -> [[SudVal]] -> [SudVal]
+        f me other secCand = filter (\x -> x `notElem` concat (secCand \\ [other])) (intersect me other)
+
+-- | Returns true if the posions has a candidate line
 lemmaCandidateLine :: Sudoku -> Position -> Bool
 lemmaCandidateLine sud pos = case concat lines of
                                 [] -> False
@@ -88,6 +144,7 @@ lemmaCandidateLine sud pos = case concat lines of
         candidates = getCandidates sud pos
         lines = map (lineBlock sud pos) candidates
 
+-- | Retuns the Line the position has if it has one
 lineBlock :: Sudoku -> Position -> SudVal -> [Line]
 lineBlock sud pos val
             | isHorizontal && length candidates > 1 && not (isIncluded Horizontal) = [Horizontal]
@@ -148,19 +205,17 @@ prop_lastCell (row, col) = lemmaLastCellInRow (fillCell illegalSudoku (row, col)
 getCandidates :: Sudoku -> Position -> [SudVal]
 getCandidates s pos = candidates
     where
-        candidates = [x | x <- [One ..], Filled x `notElem` (nub occupiedVals)]
+        candidates = [x | x <- [One ..], Filled x `notElem` nub occupiedVals]
         row = rowFromPos s pos
         col = colFromPos s pos
         block = blockFromPos s pos
-        lineCands = noteLineCandidatesRow (row \\ (intersect row block)) ++ noteLineCandidatesCol (col \\ (intersect col block))
+        lineCands = noteLineCandidatesRow (row \\ intersect row block) ++ noteLineCandidatesCol (col \\ (intersect col block))
         sections = [row, col, block]
         occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
-        pairs =  (nub $ concatMap notePairs sections) \\
+        pairs =  nub (concatMap notePairs sections) \\
                     case valFromPos s pos of
                         Note [Candidate a, Candidate b] -> [a,b]
                         _                               -> []
-
-
         values = nub $ concat sections
 
 -- | Testes whether lemma singele candidate is valid
@@ -208,7 +263,7 @@ notePairs sec = nub pVals
 
 -- | Returns true if two lists are set-equal
 (===) :: Eq a => [a] -> [a] -> Bool
-(===) xs ys = null (xs \\ ys)
+(===) xs ys = null (xs \\ ys) && null (ys \\ xs)
 
 isCandidate :: Note -> Bool
 isCandidate (Candidate _) = True
