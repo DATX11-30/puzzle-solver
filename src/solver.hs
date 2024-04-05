@@ -34,7 +34,7 @@ steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn,
         SingleCandidate,
         SinglePositionRow, SinglePositionColumn, SinglePositionBlock
         ,NakedPairBlock, NakedPairRow, NakedPairColumn
-        ,HiddenPairBlock, HiddenPairRow, HiddenPairColumn
+        --,HiddenPairBlock, HiddenPairRow, HiddenPairColumn
         ,CandidateLine
         ]
 
@@ -175,7 +175,6 @@ valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of
 
 
 -- | next step in solving the sudoku
-
 nextStep :: Sudoku -> [Position -> Step] -> Int -> (Step,Int)
 nextStep sud [] count = (NOAVAILABLESTEPS,count)
 nextStep sud (sf:sfs) count = case fst res of
@@ -183,12 +182,14 @@ nextStep sud (sf:sfs) count = case fst res of
                             x -> res
         where
                 res = tryStepsOnEmpty sud sf count
-      
+
 
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Int -> (Step,Int)
-tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (finalOrderOfPosition sud) count  --(emptyPositions sud) (finalOrderOfPosition sud)
+tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (emptyPositions sud) count  --(emptyPositions sud) (finalOrder sud)
 
+finalOrder :: Sudoku -> [Position]
+finalOrder sud = nub (finalOrderOfPosition sud ++ emptyPositions sud)
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
 emptyPositions sud = [(r,c) | r <- [0..8], c <- [0..8], not (isFilled (valFromPos sud (r,c)))]
