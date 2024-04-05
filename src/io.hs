@@ -49,7 +49,7 @@ charToSudVal '8' = Filled Eight
 charToSudVal '9' = Filled Nine
 charToSudVal '0' = Empty
 charToSudVal _ = error "incorrect value in file"
-
+{-
 parseSudoku :: String -> Sudoku
 parseSudoku [] = []
 parseSudoku xs = parse (take 9 xs) : parseSudoku (drop 9 xs)
@@ -140,3 +140,4 @@ testHiddenPairs filepath pos steps = do
         sud <- readSudoku filepath
         print $ getHiddenPairInSection (applySolution sud steps) pos (blockPositions pos)
 
+-}
