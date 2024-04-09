@@ -124,12 +124,14 @@ countChecksFromFileToFile filepath = do
         appendFile "./result.txt" (filepath ++ "\n")
         let result = (generateSolution sud emptySudoku 0)
         let sud' = applySolution sud (fst result)
-        appendFile "./result.txt" (show (snd result) ++ "\n")
+        appendFile "./result.txt" (show (snd result) ++ show(isSolved sud') ++"\n")
+        print(filepath)
         return ()
 
 countChecksForAllInDirToFile :: FilePath -> IO ()
 countChecksForAllInDirToFile dir = do
         files <- getAllSudokusInDir dir
+        print(length files)
         mapM_ countChecksFromFileToFile files
 
 countChecksForAllInDir :: FilePath -> IO ()

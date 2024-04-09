@@ -24,7 +24,7 @@ data Step =     LastFreeCellBlock Position      |
 
 type Solution = [Step]
 
-test = [SinglePositionRow (1,8),SinglePositionRow (3,8),SinglePositionRow (8,1),SingleCandidate (6,1),SingleCandidate (8,2),SinglePositionRow (2,0),SinglePositionRow (1,4),SinglePositionRow (6,7),SinglePositionRow (5,5),SinglePositionRow (4,6),SinglePositionRow (6,5),SinglePositionRow (6,8),SingleCandidate (8,8),SingleCandidate (8,4),SingleCandidate (8,5),SinglePositionRow (0,3),SinglePositionRow (7,0),SinglePositionRow (7,2),SinglePositionColumn (2,8),SinglePositionColumn (7,8),SinglePositionBlock (0,7),SinglePositionRow (0,6),SingleCandidate (7,6),SingleCandidate (7,7),SinglePositionRow (2,7),NakedPairBlock (0,0),NakedPairBlock (1,6),NakedPairBlock (4,7),NakedPairBlock (4,8),NakedPairBlock (6,0),NakedPairBlock (7,4),NakedPairRow (0,0),NakedPairBlock (3,4),CandidateLine (1,0),CandidateLine (1,1),CandidateLine (1,3),CandidateLine (1,6),HiddenPairRow (1,0),SingleCandidate (1,1),SingleCandidate (2,1),SingleCandidate (1,0),SingleCandidate (2,6),SingleCandidate (1,6),SingleCandidate (2,3),NakedPairBlock (0,4)]
+
 -- | Takes a sudoku and returns a reorginised list of steps
 optimSteps :: Sudoku -> [Position -> Step]
 optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps
@@ -192,7 +192,7 @@ nextStep sud (sf:sfs) count = case fst res of
 
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Int -> (Step,Int)
-tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (emptyPositions sud) count  --(emptyPositions sud) (finalOrder sud)
+tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (finalOrderOfPosition sud) count  --(emptyPositions sud) (finalOrderOfPosition sud)
 
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
