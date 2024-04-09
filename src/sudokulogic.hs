@@ -212,12 +212,16 @@ getCandidates s pos = candidates
         lineCands = noteLineCandidatesRow (row \\ intersect row block) ++ noteLineCandidatesCol (col \\ (intersect col block))
         sections = [row, col, block]
         occupiedVals = values ++ map Filled pairs ++ map Filled lineCands
-        pairs =  nub (concatMap notePairs sections) \\
+        pairs =  nub (concatMap notePairs sections) \\ 
                     case valFromPos s pos of
-                        Note [Candidate a, Candidate b] -> [a,b]
-                        _                               -> []
+                        Note xs -> getNotePairs xs
+                        _       -> []
         values = nub $ concat sections
 
+getNotePairs :: [Note] -> [SudVal]
+getNotePairs [] = []
+getNotePairs ((Candidate a):xs) = a : getNotePairs xs
+getNotePairs (_:xs) = getNotePairs xs
 -- | Testes whether lemma singele candidate is valid
 prop_singleCandidate :: Position -> Bool
 prop_singleCandidate (row, col) = lemmaSingleCandidate (fillCell legalSudoku (row, col) Empty) (row, col) &&

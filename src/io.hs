@@ -2,7 +2,7 @@ module IO where
 import Solver
 import Sudokus
 import Sudoku
-import SudokuLogic (getCandidates)
+import SudokuLogic (getCandidates, getHiddenPairInSection)
 import System.Directory
 import Data.List
 
@@ -11,8 +11,8 @@ import Data.List
 showSudoku :: Sudoku -> IO ()
 showSudoku sud = putStrLn $ showSud sud
 
-showSolvedSudoku :: Sudoku -> IO ()
-showSolvedSudoku sud = showSudoku (solve sud)
+showSolvedSudoku :: Sudoku -> Sudoku-> IO ()
+showSolvedSudoku sud sol = showSudoku (solve sud sol)
 
 showSud :: Sudoku -> String
 showSud sud = topRow
@@ -72,12 +72,12 @@ showSudokuFromFile filepath = do
 showSolvedSudokuFromFile :: FilePath -> IO ()
 showSolvedSudokuFromFile filepath = do
         sud <- readSudoku filepath
-        showSolvedSudoku sud
+        showSolvedSudoku sud emptySudoku
 
 generateSolutionFromFile :: FilePath -> IO ()
 generateSolutionFromFile filepath = do
         sud <- readSudoku filepath
-        print (fst (generateSolution sud 0))
+        print (fst(generateSolution sud emptySudoku 0))
 
 applySolutionFromFile :: FilePath -> [Step] -> IO ()
 applySolutionFromFile filepath steps = do

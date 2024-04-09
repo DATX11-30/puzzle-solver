@@ -24,7 +24,7 @@ blocksPos  = [[(r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,
 
 -- | Returns all posible positions for a value to be placed  
 getAllPositionForValue :: Sudoku -> SudVal -> [Position]
-getAllPositionForValue sud val = concat $ (reverse(sortOn (length) (getPos' blocksPos))) 
+getAllPositionForValue sud val = concat $ sortOn (length) (getPos' blocksPos) 
     where   getPos' :: [[Position]] -> [[Position]]
             getPos' [] = []
             getPos' (s:ss) = (filter (\x -> elem val (getCandidates sud x) && (not (isFilled (valFromPos sud x)))) s) : (getPos' ss)
@@ -45,12 +45,10 @@ findOccuranceOfNumber val sud = length (filter (\x -> x == val) sudlist)
     where 
         sudlist = concat sud
 
-
-
 {------------
 Functions for optimising the teqniques used when
 ------------}
-{-
+
 -- |Sorts a list of tupels by the first value in the tuple
 sudStepOrder :: [(Int,a)] ->[a]
 sudStepOrder list = [snd x |x <-(sortOn fst list)] 
@@ -124,4 +122,3 @@ filledSectionWNotes :: Section -> Int
 filledSectionWNotes [] = 0
 filledSectionWNotes ((Empty):sp) = 0 + filledSection sp
 filledSectionWNotes (_:sp) = 1 + filledSection sp
--}
