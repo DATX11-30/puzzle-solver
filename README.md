@@ -1,4 +1,4 @@
-# puzzle-solver
+# Logic in Puzzles
 
 A bachelor thesis project at Chalmers University of Technology
 
