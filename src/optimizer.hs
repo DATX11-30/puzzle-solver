@@ -50,7 +50,7 @@ findOccuranceOfNumber val sud = length (filter (\x -> x == val) sudlist)
 {------------
 Functions for optimising the teqniques used when
 ------------}
-
+{-
 -- |Sorts a list of tupels by the first value in the tuple
 sudStepOrder :: [(Int,a)] ->[a]
 sudStepOrder list = [snd x |x <-(sortOn fst list)] 
@@ -124,3 +124,4 @@ filledSectionWNotes :: Section -> Int
 filledSectionWNotes [] = 0
 filledSectionWNotes ((Empty):sp) = 0 + filledSection sp
 filledSectionWNotes (_:sp) = 1 + filledSection sp
+-}

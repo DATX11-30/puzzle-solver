@@ -69,6 +69,16 @@ exSudoku3 = [[Empty, Filled Four, Filled Seven, Empty, Empty, Filled Six, Empty,
              [Empty, Filled Eight, Empty, Filled Three, Empty, Empty, Empty, Empty, Empty],
              [Filled Nine, Empty, Empty, Filled Four, Empty, Empty, Filled One, Filled Five, Empty]]
 
+solvedexSudoku3 :: Sudoku 
+solvedexSudoku3 = [[Filled Five, Filled Four, Filled Seven, Filled Eight, Filled Two, Filled Six, Filled Nine, Filled One, Filled Three],
+                   [Filled One, Filled Nine, Filled Two, Filled Five, Filled Three, Filled Four, Filled Six, Filled Eight, Filled Seven],
+                   [Filled Three, Filled Six, Filled Eight, Filled Nine, Filled Seven, Filled One, Filled Two, Filled Four, Filled Five],
+                   [Filled Two, Filled One, Filled Three, Filled Seven, Filled Four, Filled Eight, Filled Five, Filled Six, Filled Nine],
+                   [Filled Eight, Filled Seven, Filled Four, Filled Six, Filled Nine, Filled Five, Filled Three, Filled Two, Filled One],
+                   [Filled Six, Filled Five, Filled Nine, Filled Two, Filled One, Filled Three, Filled Eight, Filled Seven, Filled Four],
+                   [Filled Four, Filled Two, Filled Five, Filled One, Filled Six, Filled Nine, Filled Seven, Filled Three, Filled Eight],
+                   [Filled Seven, Filled Eight, Filled One, Filled Three, Filled Five, Filled Two, Filled Four, Filled Nine, Filled Six],
+                   [Filled Nine, Filled Three, Filled Six, Filled Four, Filled Eight, Filled Seven, Filled One, Filled Five, Filled Two]]
 missingTopRowSud :: Sudoku
 missingTopRowSud = [[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
                  [Filled Seven, Filled One, Filled Nine, Filled Four, Filled Two, Filled Five, Filled Eight, Filled Three, Filled Six],
