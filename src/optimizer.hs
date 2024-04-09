@@ -16,7 +16,7 @@ Functions for prioritating which positions to check first
 
 -- | Creating the final list of positions by order of most used number and most filled block
 finalOrderOfPosition :: Sudoku -> [Position]
-finalOrderOfPosition sud = reverse (nub (concat [getAllPositionForValue sud sudval|sudval <- (sudValOrder (findOccuranceOfNumbers sud))]))
+finalOrderOfPosition sud =  nub (concat [getAllPositionForValue sud sudval|sudval <- (sudValOrder (findOccuranceOfNumbers sud))])
 
 -- | Returning all positions in each block  
 blocksPos :: [[Position]]

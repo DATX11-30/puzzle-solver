@@ -206,8 +206,7 @@ tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Int -> (Step,Int)
 tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (emptyPositions sud) count  --(emptyPositions sud) (finalOrder sud)
 -}
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Step
-tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (emptyPositions sud)  --(emptyPositions sud) (finalOrderOfPosition sud)
-
+tryStepsOnEmpty sud sf = tryStepOnPositions sud sf (finalOrderOfPosition sud)  --(emptyPositions sud) (finalOrderOfPosition sud)
 
 finalOrder :: Sudoku -> [Position]
 finalOrder sud = nub (finalOrderOfPosition sud ++ emptyPositions sud)
