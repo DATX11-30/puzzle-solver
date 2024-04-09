@@ -24,6 +24,7 @@ data Step =     LastFreeCellBlock Position      |
 
 type Solution = [Step]
 
+
 -- | Takes a sudoku and returns a reorginised list of steps
 optimSteps :: Sudoku -> [Position -> Step]
 optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps
@@ -39,26 +40,34 @@ steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn,
         ]
 
 -- | Takes a sudoku and returns a solved sudoku
-solve :: Sudoku -> Sudoku
-solve sud = applySolution sud (fst (generateSolution sud 0))
+solve :: Sudoku -> Sudoku -> Sudoku
+solve sud sol = applySolution sud (fst (generateSolution sud sol 0))
 
 -- | Returns how many check it took to reach a solution to a sudoku
-checksCount :: Sudoku -> (Solution, Int)
-checksCount sud = (generateSolution sud 0)
+checksCount :: Sudoku -> Sudoku ->(Solution, Int)
+checksCount sud sol = (generateSolution sud sol 0)
 
 -- | A solver for sudoku
 applySolution :: Sudoku -> Solution -> Sudoku
 applySolution = foldl placeValueFromStep
 
 -- | Generates a Solution
-generateSolution :: Sudoku -> Int -> (Solution,Int)
-generateSolution sud count = case fst next of
+generateSolution :: Sudoku -> Sudoku -> Int -> (Solution,Int)
+generateSolution sud sol  count = case fst next of
                             NOAVAILABLESTEPS -> ([],count)
-                            _ -> (fst next : fst res ,snd res) 
+                            _ -> if isValid then (fst next : fst res, snd res)  else error "invalid solution"
     where
+        isValid = isValid' u o 
         next = nextStep sud (steps) 0 --steps -- (optimSteps sud)
-        res = generateSolution (placeValueFromStep sud (fst next)) (count + snd next)
- 
+        res = generateSolution (placeValueFromStep sud (fst next)) sol (count + snd next)
+        u = concat sud
+        o = concat sol
+        isValid' :: [Value] -> [Value] -> Bool
+        isValid' [] [] = True
+        isValid' (_:xs) (Empty:ys) = isValid' xs ys 
+        isValid' ((Filled x):xs) ((Filled y):ys) = and [(x == y), isValid' xs ys] 
+        isValid' (_:xs) (_:ys) = isValid' xs ys
+
 placeValueFromStep :: Sudoku -> Step -> Sudoku
 placeValueFromStep sud (LastFreeCellBlock p)    = fillCell sud p (valueFromLFCB sud p)
 placeValueFromStep sud (LastFreeCellRow p)      = fillCell sud p (valueFromLFCR sud p)
@@ -171,11 +180,7 @@ valueFromCL sud pos = case filter (\(l,v) -> l /= []) lines of
         candidates = getCandidates sud pos
         lines = [(lineBlock sud pos l, l) | l <- candidates, lineBlock sud pos l /= []]
 
-
-
-
 -- | next step in solving the sudoku
-
 nextStep :: Sudoku -> [Position -> Step] -> Int -> (Step,Int)
 nextStep sud [] count = (NOAVAILABLESTEPS,count)
 nextStep sud (sf:sfs) count = case fst res of
@@ -183,7 +188,7 @@ nextStep sud (sf:sfs) count = case fst res of
                             x -> res
         where
                 res = tryStepsOnEmpty sud sf count
-      
+
 
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Int -> (Step,Int)
@@ -196,6 +201,7 @@ emptyPositions sud = [(r,c) | r <- [0..8], c <- [0..8], not (isFilled (valFromPo
 propOrderPos sud = (finalOrderOfPosition sud \\ emptyPositions sud)
 
 --prop_getAllPos sud = all (\x -> elem x (emptyPositions sud)) (concat $ getAllPositionForValue sud)
+
 
 -- | Tries to apply a lemma/step to all position, 
 tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Int -> (Step,Int)
@@ -220,7 +226,6 @@ testStep sud (HiddenPairRow p) = lemmaHiddenPairRow sud p
 testStep sud (HiddenPairColumn p) = lemmaHiddenPairColumn sud p
 testStep sud (HiddenPairBlock p) = lemmaHiddenPairBlock sud p
 testStep sud _ = error "lemma not implemented"
-
 
 -- | Returns True if a sudoku is full otherwise return 
 isSolved :: Sudoku -> Bool
