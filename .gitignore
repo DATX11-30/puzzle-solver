@@ -2,3 +2,5 @@
 *.o
 *.hi
 .DS_STORE
+venv
+node_modules
