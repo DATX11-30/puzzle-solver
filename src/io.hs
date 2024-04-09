@@ -63,6 +63,14 @@ readSudoku filepath = do
         content <- readFile filepath
         return $ parseSudoku $ take 81 content
 
+readSudNSol :: FilePath -> IO (Sudoku, Sudoku)
+readSudNSol filepath = do
+        content <- readFile filepath
+        let ls = lines content
+        let sud = parseSudoku $ head ls
+        let sol = parseSudoku $ ls !! 1
+        return (sud, sol)
+
 showSudokuFromFile :: FilePath -> IO ()
 showSudokuFromFile filepath = do
         sud <- readSudoku filepath
