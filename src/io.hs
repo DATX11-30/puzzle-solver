@@ -58,6 +58,31 @@ parseSudoku xs = parse (take 9 xs) : parseSudoku (drop 9 xs)
                 parse [] = []
                 parse (y:ys) = charToSudVal y : parse ys
 
+
+sudValToChar :: Value -> Char
+sudValToChar (Filled One) = '1'
+sudValToChar (Filled Two) = '2'
+sudValToChar (Filled Three) = '3'
+sudValToChar (Filled Four) = '4'
+sudValToChar (Filled Five) = '5'
+sudValToChar (Filled Six) = '6'
+sudValToChar (Filled Seven) = '7'
+sudValToChar (Filled Eight) = '8'
+sudValToChar (Filled Nine) = '9'
+sudValToChar Empty = '0'
+
+
+deParseSudoku :: Sudoku -> String
+deParseSudoku sud = concatMap deParse sud
+        where
+                deParse :: [Value] -> String
+                deParse [] = []
+                deParse (x:xs) = sudValToChar x : deParse xs
+
+
+
+
+
 readSudoku :: FilePath -> IO Sudoku
 readSudoku filepath = do
         content <- readFile filepath
