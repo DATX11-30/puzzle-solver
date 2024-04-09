@@ -25,8 +25,8 @@ data Step =     LastFreeCellBlock Position      |
 type Solution = [Step]
 
 -- | Takes a sudoku and returns a reorginised list of steps
-optimSteps :: Sudoku -> [Position -> Step]
-optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps
+--optimSteps :: Sudoku -> [Position -> Step]
+--optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps
 
 -- | List of every step the solver can try
 steps :: [Position -> Step]
@@ -34,7 +34,7 @@ steps = [--LastFreeCellBlock, LastFreeCellRow, LastFreeCellCollumn,
         SingleCandidate,
         SinglePositionRow, SinglePositionColumn, SinglePositionBlock
         ,NakedPairBlock, NakedPairRow, NakedPairColumn
-        --,HiddenPairBlock, HiddenPairRow, HiddenPairColumn
+        ,HiddenPairBlock, HiddenPairRow, HiddenPairColumn
         ,CandidateLine
         ]
 {-
@@ -55,13 +55,22 @@ applySolution :: Sudoku -> Solution -> Sudoku
 applySolution = foldl placeValueFromStep
 
 -- | Generates a Solution
-generateSolution :: Sudoku -> Solution
-generateSolution sud = case next of
+generateSolution :: Sudoku -> Sudoku -> Solution
+generateSolution sud sol = case next of
                             NOAVAILABLESTEPS -> []
-                            _ -> next : generateSolution (placeValueFromStep sud next)
+                            _ -> if isValid then next : generateSolution (placeValueFromStep sud next) sol else error "invalid solution"
     where
+        isValid = isValid' u o 
         next = nextStep sud steps
+        u = concat sud
+        o = concat sol        
+        isValid' :: [Value] -> [Value] -> Bool
+        isValid' [] [] = True
+        isValid' ((Filled x):xs) ((Filled y):ys) = and [(x == y), isValid' xs ys] 
+        isValid' (_:xs) (_:ys) = isValid' xs ys
 {-
+        
+
 -- | Generates a Solution
 generateSolution :: Sudoku -> Int -> (Solution,Int)
 generateSolution sud count = case fst next of
