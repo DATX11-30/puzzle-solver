@@ -81,6 +81,14 @@ showSolvedSudokuFromFile filepath = do
         sud <- readSudoku filepath
         showSolvedSudoku sud
 
+showSudNSolFromFile :: FilePath -> IO ()
+showSudNSolFromFile filepath = do
+        (sud, sol) <- readSudNSol filepath
+        putStrLn "Sudoku:"
+        showSudoku sud
+        putStrLn "Solution:"
+        showSudoku sol
+
 generateSolutionFromFile :: FilePath -> IO ()
 generateSolutionFromFile filepath = do
         sud <- readSudoku filepath
