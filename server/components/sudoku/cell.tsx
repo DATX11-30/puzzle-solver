@@ -1,18 +1,17 @@
+import { log } from "console";
+
 export default function Cell({ notes }: { notes?: number[] }) {
-	if (notes) {
-		return (
-			<div className="cell">
-				{notes.map((note, index) => (
-					<p className={toString(note)} key={index}>
-						{note}
-					</p>
-				))}
-			</div>
-		);
-	} else {
-		return <div className="cell"></div>;
-	}
+	if (notes) return <div className="cell">{notes.map(generateNotes)}</div>;
+	return <div className="cell"></div>;
 }
+
+const generateNotes = (note: number, index: number) => {
+	return (
+		<div className={toString(note)} key={index}>
+			{note}
+		</div>
+	);
+};
 
 const toString = (note: number) => {
 	switch (note) {

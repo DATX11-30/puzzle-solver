@@ -11,7 +11,11 @@ export default function Dropdown({
 			<div className="container-fluid center">
 				{sudokus.map((sudoku, index) => {
 					const { filename, date } = sudoku;
-					return <a href={filename}>{date}</a>;
+					return (
+						<a href={filename} key={index}>
+							{date}
+						</a>
+					);
 				})}
 			</div>
 		</details>
