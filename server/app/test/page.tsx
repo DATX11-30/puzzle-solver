@@ -8,8 +8,7 @@ export default function Home() {
 				padding: "3%",
 				// gridTemplateRows: "auto auto auto",
 				alignContent: "start",
-				justifyContent: "center",
-				height: "100vh"
+				justifyContent: "center"
 			}}
 		>
 			<article
@@ -29,15 +28,14 @@ export default function Home() {
 						flexDirection: "row",
 						justifyContent: "center",
 						alignContent: "center",
-						height: "100%",
 						width: "100%"
 					}}
 				>
-					<article className="conatiner-fluid" style={{ aspectRatio: "1/1", marginRight: "1%" }}>
+					<article className="container-fluid" style={{ marginRight: "1%" }}>
 						<header>Sudoku</header>
 						<Sudoku />
 					</article>
-					<article className="container-fluid" style={{ height: "100%" }}>
+					<article className="container-fluid" style={{ maxWidth: "30%" }}>
 						<header>Choose a difficulty</header>
 						<div className="overflow-auto">
 							<Dropdown difficulty={"Beginner"} />
