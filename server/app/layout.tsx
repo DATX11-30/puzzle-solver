@@ -14,7 +14,13 @@ export const metadata: Metadata = {
 	applicationName: "Puzzle Solver",
 	referrer: "origin-when-cross-origin",
 	keywords: ["Next.js", "React", "JavaScript"],
-	authors: [{ name: "Max Hagman", url: "maxhagman.se" }],
+	authors: [
+		{ name: "Max Hagman", url: "maxhagman.se" },
+		{ name: "Moltas Hultin" },
+		{ name: "Isac Holm" },
+		{ name: "Karl Göransson Kjellmer" },
+		{ name: "Victor Ebbesson" }
+	],
 	creator: "Group 30 DATX11",
 	formatDetection: {
 		email: true,
