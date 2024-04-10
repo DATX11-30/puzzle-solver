@@ -9,9 +9,10 @@
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
 	grid-gap: 3px;
-	border: 3px solid black;
-	width: 800px;
-	height: 800px;
+	border: 1px solid black;
+	aspect-ratio: 1 / 1;
+	height: 95%;
+	min-height: 675px;
 }
 
 .block {
@@ -22,50 +23,54 @@
 }
 
 .cell {
-	padding: 5px;
 	background-color: white;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
 }
 
-.cell p {
-	color: blanchedalmond;
+.cell div {
+	color: gray;
 	font-size: medium;
+	padding: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: none;
 }
 
 .one {
-	grid: 1 / 1;
+	grid-area: 1 / 1;
 }
 
 .two {
-	grid: 1 / 2;
+	grid-area: 1 / 2;
 }
 
 .three {
-	grid: 1 / 3;
+	grid-area: 1 / 3;
 }
 
 .four {
-	grid: 2 / 1;
+	grid-area: 2 / 1;
 }
 
 .five {
-	grid: 2 / 2;
+	grid-area: 2 / 2;
 }
 
 .six {
-	grid: 2 / 3;
+	grid-area: 2 / 3;
 }
 
 .seven {
-	grid: 3 / 1;
+	grid-area: 3 / 1;
 }
 
 .eight {
-	grid: 3 / 2;
+	grid-area: 3 / 2;
 }
 
 .nine {
-	grid: 3 / 3;
+	grid-area: 3 / 3;
 }
