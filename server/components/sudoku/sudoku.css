@@ -12,6 +12,7 @@
 	border: 1px solid black;
 	aspect-ratio: 1 / 1;
 	height: 95%;
+	max-height: 90vh;
 	min-height: 675px;
 }
 
@@ -30,13 +31,22 @@
 }
 
 .cell div {
-	color: gray;
-	font-size: medium;
-	padding: none;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	padding: none;
 	margin: none;
+}
+
+.note {
+	color: gray;
+	font-size: small;
+}
+
+.value {
+	color: black;
+	font-size: large;
+	grid-area: 1 / 1 / span 3 / span 3;
 }
 
 .one {

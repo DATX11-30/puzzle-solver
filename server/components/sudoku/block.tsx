@@ -1,17 +1,28 @@
 import Cell from "./cell";
 
-export default function Block() {
+export default function Block({ values, notes }: { values?: string; notes?: string[][] }) {
+	let value: string[] = new Array(9).fill("0");
+	if (values) {
+		for (let i = 0; i < values.length; i++) {
+			value[i] = values[i];
+		}
+	}
+
+	if (notes) {
+		return (
+			<div className="block">
+				{[...Array(9)].map((_, i) => {
+					return <Cell key={i} value={value[i]} notes={notes[i]} />;
+				})}
+			</div>
+		);
+	}
+
 	return (
 		<div className="block">
-			<Cell notes={[1, 2, 3]} />
-			<Cell notes={[5, 4, 8]} />
-			<Cell notes={[2, 5, 7]} />
-			<Cell />
-			<Cell notes={[9]} />
-			<Cell notes={[6, 7]} />
-			<Cell notes={[1, 2, 3, 4, 5, 6, 7, 8, 9]} />
-			<Cell notes={[9, 8, 7, 6, 5, 4, 3, 2, 1]} />
-			<Cell notes={[5, 3, 7, 9]} />
+			{[...Array(9)].map((_, i) => {
+				return <Cell key={i} value={value[i]} />;
+			})}
 		</div>
 	);
 }
