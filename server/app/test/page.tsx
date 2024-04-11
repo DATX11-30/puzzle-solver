@@ -39,7 +39,7 @@ export default function Home() {
 						<div className="overflow-auto">
 							<Dropdown difficulty={"Beginner"} />
 							<Dropdown difficulty={"Easy"} />
-							<Dropdown difficulty={"Intermediate"} />
+							<Dropdown difficulty={"Medium"} />
 							<Dropdown difficulty={"Tricky"} />
 							<Dropdown difficulty={"Fiendish"} />
 						</div>

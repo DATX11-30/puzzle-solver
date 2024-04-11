@@ -1,14 +1,26 @@
-export default function Dropdown({
+import { readFile, readdir } from "fs/promises";
+
+export default async function Dropdown({
 	difficulty
 }: {
-	difficulty: "Beginner" | "Easy" | "Intermediate" | "Tricky" | "Fiendish";
+	difficulty: "Beginner" | "Easy" | "Medium" | "Tricky" | "Fiendish";
 }) {
-	const path = "../sudoku/";
+	const path = "./sudokus/";
+
+	const files = await readdir(path);
 	let sudokus: { filename: string; date: string }[] = [];
+	files.map(async (file) => {
+		if (file.startsWith(difficulty)) {
+			sudokus.push({
+				filename: file,
+				date: file.substring(difficulty.length + 1, difficulty.length + 11).replace(/_/g, "/")
+			});
+		}
+	});
 	return (
 		<details>
 			<summary role="button">{difficulty}</summary>
-			<div className="center">
+			<div style={{ display: "flex", justifyContent: "space-around", flexDirection: "column" }}>
 				{sudokus.map((sudoku, index) => {
 					const { filename, date } = sudoku;
 					return (
