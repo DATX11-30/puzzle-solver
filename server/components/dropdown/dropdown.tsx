@@ -1,4 +1,5 @@
-import { readFile, readdir } from "fs/promises";
+import { readdir } from "fs/promises";
+import Droplist from "./droplist";
 
 export default async function Dropdown({
 	difficulty
@@ -20,15 +21,10 @@ export default async function Dropdown({
 	return (
 		<details>
 			<summary role="button">{difficulty}</summary>
-			<div style={{ display: "flex", justifyContent: "space-around", flexDirection: "column" }}>
-				{sudokus.map((sudoku, index) => {
-					const { filename, date } = sudoku;
-					return (
-						<a href={filename} key={index}>
-							{date}
-						</a>
-					);
-				})}
+			<div className="center grid">
+				<Droplist items={sudokus.splice(0, sudokus.length / 3)} />
+				<Droplist items={sudokus.splice(0, sudokus.length / 2)} />
+				<Droplist items={sudokus} />
 			</div>
 		</details>
 	);
