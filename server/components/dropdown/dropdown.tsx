@@ -8,7 +8,7 @@ export default function Dropdown({
 	return (
 		<details>
 			<summary role="button">{difficulty}</summary>
-			<div className="container-fluid center">
+			<div className="center">
 				{sudokus.map((sudoku, index) => {
 					const { filename, date } = sudoku;
 					return (

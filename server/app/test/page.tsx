@@ -6,7 +6,6 @@ export default function Home() {
 		<body
 			style={{
 				padding: "3%",
-				// gridTemplateRows: "auto auto auto",
 				alignContent: "start",
 				justifyContent: "center"
 			}}
