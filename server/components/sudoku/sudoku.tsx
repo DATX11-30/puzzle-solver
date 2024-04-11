@@ -12,11 +12,3 @@ export default function Sudoku({ sudoku }: { sudoku?: string }) {
 		</div>
 	);
 }
-
-const stringToSudoku = (sudoku: string) => {
-	// get the 9 first characters of sudoku
-	const rows: string[] = [sudoku.slice(0, 9)];
-	log(rows[0]);
-	const blocks = rows.map((row) => row.match(/.{1,3}/g));
-	return blocks;
-};
