@@ -24,7 +24,7 @@ blocksPos  = [[(r+i,c+j) |  i <- [0..2], j <- [0..2]] | r <- [0,3,6], c <- [0,3,
 
 -- | Returns all posible positions for a value to be placed  
 getAllPositionForValue :: Sudoku -> SudVal -> [Position]
-getAllPositionForValue sud val = concat $ (reverse(sortOn (length) (getPos' blocksPos))) 
+getAllPositionForValue sud val = concat $ reverse $ sortOn (length) (getPos' blocksPos) 
     where   getPos' :: [[Position]] -> [[Position]]
             getPos' [] = []
             getPos' (s:ss) = (filter (\x -> elem val (getCandidates sud x) && (not (isFilled (valFromPos sud x)))) s) : (getPos' ss)
