@@ -1,4 +1,4 @@
-import Test.QuickCheck
+--import Test.QuickCheck
 import IO
 import Logic
 import Solver

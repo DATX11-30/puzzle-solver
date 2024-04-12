@@ -6,12 +6,13 @@ import SudokuLogic (getCandidates, getHiddenPairInSection)
 import System.Directory
 import Data.List
 
+
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
 showSudoku sud = putStrLn $ showSud sud
 
-showSolvedSudoku :: Sudoku -> IO ()
-showSolvedSudoku sud = showSudoku (solve sud)
+showSolvedSudoku :: Sudoku -> Sudoku-> IO ()
+showSolvedSudoku sud sol = showSudoku (solve sud sol)
 
 showSud :: Sudoku -> String
 showSud sud = topRow
@@ -63,6 +64,14 @@ readSudoku filepath = do
         content <- readFile filepath
         return $ parseSudoku $ take 81 content
 
+readSudNSol :: FilePath -> IO (Sudoku, Sudoku)
+readSudNSol filepath = do
+        content <- readFile filepath
+        let ls = lines content
+        let sud = parseSudoku $ head ls
+        let sol = parseSudoku $ ls !! 1
+        return (sud, sol)
+
 showSudokuFromFile :: FilePath -> IO ()
 showSudokuFromFile filepath = do
         sud <- readSudoku filepath
@@ -71,12 +80,20 @@ showSudokuFromFile filepath = do
 showSolvedSudokuFromFile :: FilePath -> IO ()
 showSolvedSudokuFromFile filepath = do
         sud <- readSudoku filepath
-        showSolvedSudoku sud
+        showSolvedSudoku sud emptySudoku
+
+showSudNSolFromFile :: FilePath -> IO ()
+showSudNSolFromFile filepath = do
+        (sud, sol) <- readSudNSol filepath
+        putStrLn "Sudoku:"
+        showSudoku sud
+        putStrLn "Solution:"
+        showSudoku sol
 
 generateSolutionFromFile :: FilePath -> IO ()
 generateSolutionFromFile filepath = do
         sud <- readSudoku filepath
-        print (fst (generateSolution sud 0))
+        print (fst(generateSolution sud emptySudoku 0))
 
 applySolutionFromFile :: FilePath -> [Step] -> IO ()
 applySolutionFromFile filepath steps = do
@@ -87,6 +104,7 @@ getCandidatesIO :: FilePath -> Position -> IO [SudVal]
 getCandidatesIO filepath pos = do
         sud <- readSudoku filepath
         return $ getCandidates sud pos
+
 
 getAllSudokusInDir :: FilePath -> IO [FilePath]
 getAllSudokusInDir dir = do
@@ -108,7 +126,7 @@ countChecksFromFile :: FilePath -> IO ()
 countChecksFromFile filepath = do
         sud <- readSudoku filepath
         print filepath
-        let result = (generateSolution sud 0)
+        let result = (checksCount sud emptySudoku)
         let sud' = applySolution sud (fst result)
         --showSudoku sud
         --showSudoku sud'
@@ -120,14 +138,16 @@ countChecksFromFileToFile :: FilePath -> IO ()
 countChecksFromFileToFile filepath = do
         sud <- readSudoku filepath
         appendFile "./result.txt" (filepath ++ "\n")
-        let result = (generateSolution sud 0)
+        let result = (generateSolution sud emptySudoku 0)
         let sud' = applySolution sud (fst result)
-        appendFile "./result.txt" (show (snd result) ++ "\n")
+        appendFile "./result.txt" (show (snd result) ++ show(isSolved sud') ++"\n")
+        print(filepath)
         return ()
 
 countChecksForAllInDirToFile :: FilePath -> IO ()
 countChecksForAllInDirToFile dir = do
         files <- getAllSudokusInDir dir
+        print(length files)
         mapM_ countChecksFromFileToFile files
 
 countChecksForAllInDir :: FilePath -> IO ()
