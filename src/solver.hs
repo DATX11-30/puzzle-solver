@@ -55,7 +55,7 @@ applySolution = foldl placeValueFromStep
 generateSolution :: Sudoku -> Sudoku -> Int -> (Solution,Int)
 generateSolution sud sol  count = case fst next of
                             NOAVAILABLESTEPS -> ([],count)
-                            _ -> if isValid then (fst next : fst res, snd res)  else error "invalid solution"
+                            _ -> if isValid then (if count > 50000 then ([],count) else (fst next : fst res, snd res))else error "invalid solution"
     where
         isValid = isValid' u o 
         next = nextStep sud (steps) 0 --steps -- (optimSteps sud)
@@ -192,7 +192,7 @@ nextStep sud (sf:sfs) count = case fst res of
 
 -- | Applies tryStepOnPositions to all empty positions in a given sudoku
 tryStepsOnEmpty :: Sudoku -> (Position -> Step) -> Int -> (Step,Int)
-tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf (finalOrderOfPosition sud) count  --(emptyPositions sud) (finalOrderOfPosition sud)
+tryStepsOnEmpty sud sf count= tryStepOnPositions sud sf ((finalOrderOfPosition sud)) count  --(emptyPositions sud) (finalOrderOfPosition sud)
 
 -- | Returns all empty positions in a given sudoku
 emptyPositions :: Sudoku -> [Position]
@@ -206,7 +206,7 @@ propOrderPos sud = (finalOrderOfPosition sud \\ emptyPositions sud)
 -- | Tries to apply a lemma/step to all position, 
 tryStepOnPositions :: Sudoku -> (Position -> Step) -> [Position] -> Int -> (Step,Int)
 tryStepOnPositions sud _ [] count       = (NOAVAILABLESTEPS,count)
-tryStepOnPositions sud sf (p:ps) count  | testStep sud (sf p) = (sf p,count)
+tryStepOnPositions sud sf (p:ps) count  | testStep sud (sf p) = (sf p,count + 1)
                                         | otherwise = tryStepOnPositions sud sf ps (count+1)
 
 -- | Tests if a step is valid for the given sudoku
