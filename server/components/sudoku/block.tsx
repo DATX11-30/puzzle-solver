@@ -1,28 +1,27 @@
 import Cell from "./cell";
 
-export default function Block({ values, notes }: { values?: string; notes?: string[][] }) {
-	let value: string[] = new Array(9).fill("0");
-	if (values) {
-		for (let i = 0; i < values.length; i++) {
-			value[i] = values[i];
-		}
-	}
+export default function Block({ values }: { values?: (string | string[])[] }) {
+  let value: string[] = new Array(9).fill("0");
 
-	if (notes) {
-		return (
-			<div className="block">
-				{[...Array(9)].map((_, i) => {
-					return <Cell key={i} value={value[i]} notes={notes[i]} />;
-				})}
-			</div>
-		);
-	}
+  if (!values) {
+    return (
+      <div className="block">
+        {value.map((v, i) => {
+          return <Cell key={i} value={v} />;
+        })}
+      </div>
+    );
+  }
 
-	return (
-		<div className="block">
-			{[...Array(9)].map((_, i) => {
-				return <Cell key={i} value={value[i]} />;
-			})}
-		</div>
-	);
+  return (
+    <div className="block">
+      {values.map((v, i) => {
+        if (Array.isArray(v)) {
+          value = v;
+          return <Cell key={i} notes={v} />;
+        }
+        return <Cell key={i} value={v} />;
+      })}
+    </div>
+  );
 }

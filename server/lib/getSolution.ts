@@ -5,7 +5,7 @@ import { cwd } from "process";
 export async function getSolutionFromFile(fileName: string): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(
-      "./out " + "./sudokus/" + fileName + ".txt",
+      "./out " + "./sudokus/" + fileName,
       { cwd: cwd() },
       (error, stdout, stderr) => {
         if (error) {
@@ -18,10 +18,6 @@ export async function getSolutionFromFile(fileName: string): Promise<string> {
       }
     );
   });
-}
-
-export async function getAllSudokus(): Promise<string> {
-  throw new Error("Not implemented");
 }
 
 export async function getSolution(

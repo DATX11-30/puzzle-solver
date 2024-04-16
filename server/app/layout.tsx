@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   keywords: ["Next.js", "React", "JavaScript"],
   authors: [
     { name: "Max Hagman", url: "maxhagman.se" },
-    { name: "Moltas Hultin" },
+    { name: "Moltas Hultin", url: "hultin.io" },
     { name: "Isac Holm" },
     { name: "Karl Göransson Kjellmer" },
     { name: "Victor Ebbesson" },
@@ -49,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="p-[3%] align-middle justify-center">
       <body>{children}</body>
     </html>
   );

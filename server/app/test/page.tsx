@@ -3,13 +3,6 @@ import Sudoku from "@/components/sudoku/sudoku";
 
 export default function Home() {
 	return (
-		<body
-			style={{
-				padding: "3%",
-				alignContent: "start",
-				justifyContent: "center"
-			}}
-		>
 			<article
 				className="container-fluid"
 				style={{
@@ -47,6 +40,5 @@ export default function Home() {
 				</div>
 				<footer>Created by Group 30 of DATX11</footer>
 			</article>
-		</body>
 	);
 }
