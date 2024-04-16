@@ -147,7 +147,7 @@ countChecksFromFileToFile filepath = do
 
 countChecksForAllInDirToFile :: FilePath -> IO ()
 countChecksForAllInDirToFile dir = do
-        appendFile ".result.txt" dir
+        appendFile "./result.txt" dir
         files <- getAllSudokusInDir dir
         print(length files)
         mapM_ countChecksFromFileToFile files
