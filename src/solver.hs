@@ -24,7 +24,6 @@ data Step =     LastFreeCellBlock Position      |
 
 type Solution = [Step]
 
-
 -- | Takes a sudoku and returns a reorginised list of steps
 optimSteps :: Sudoku -> [Position -> Step]
 optimSteps sud = sudStepOrder $ zip (stepWeight sud) steps

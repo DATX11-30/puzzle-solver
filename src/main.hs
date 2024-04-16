@@ -24,20 +24,34 @@ main = do
           print content
         else do
           sud <- readSudoku filePath
-          let solution = fst (generateSolution sud 0)
-          writeFile solFilePath (show solution ++ "\n")
+          let result = generateSolution sud emptySudoku 0
+          let solution = fst result
+          let amountChecks = snd result
+          writeFile solFilePath ("Solution:\n" ++ outputArray solution show ++ "\n" ++ show amountChecks ++ "\n")
           print (show solution)
+          appendFile solFilePath "PartialSudokus:\n"
           applyStepAndWrite sud solution solFilePath
+          --writeFile solFilePath (test sud solution amountChecks)
+
     else
       if length args == 2
         then do
           let sudString :: String = args !! 1
           let sud = parseSudoku sudString
-          let solution = fst (generateSolution sud 0)
+          let result = generateSolution sud emptySudoku 0
+          let solution = fst result
+          let amountChecks = snd result
           print (show solution)
         else putStrLn "Usage: sudoku <sudoku_file_path> <sudoku_string>"
   return ()
 
+--Can't get it to work
+test :: Sudoku -> Solution -> Int -> String
+test sud sol checks = "{\n" ++ 
+  "  \"solution\": [" ++ outputArray sol show ++ "],\n" ++
+  "  \"checks\": " ++ show checks ++ ",\n" ++
+  "  \"partialSudokus\": [" ++ outputArray (getPartialSudokus sud sol) deParseSudoku ++"]\n" ++
+  "}"
 
 applyStepAndWrite :: Sudoku -> Solution -> FilePath -> IO ()
 applyStepAndWrite sud [] _ = return ()
@@ -47,4 +61,16 @@ applyStepAndWrite sud (x:xs) filePath = do
   appendFile filePath (s ++ "\n")
   applyStepAndWrite sud' xs filePath
   return ()
+
+
+getPartialSudokus :: Sudoku -> Solution -> [Sudoku]
+getPartialSudokus sud sol = getPartialSudokus' sud sol [sud]
+
+getPartialSudokus' :: Sudoku -> Solution -> [Sudoku] -> [Sudoku]
+getPartialSudokus' sud [] partials = partials
+getPartialSudokus' sud (x:xs) partials = getPartialSudokus' sud' xs (sud':partials)
+  where sud' = placeValueFromStep sud x
  
+outputArray:: Show a => [a] -> (a -> String) -> String
+outputArray [x] f = "\"" ++ f x ++ "\""
+outputArray (x:xs) f = "\"" ++ (f x) ++ "\",\n" ++ outputArray xs f
