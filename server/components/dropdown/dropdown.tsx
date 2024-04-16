@@ -1,31 +1,34 @@
-import { readdir } from "fs/promises";
+"use client";
+
+import { getSudokus } from "@/lib/getSudokus";
 import Droplist from "./droplist";
+import { useEffect, useState } from "react";
 
-export default async function Dropdown({
-	difficulty
+export default function Dropdown({
+  difficulty,
 }: {
-	difficulty: "Beginner" | "Easy" | "Medium" | "Tricky" | "Fiendish";
+  difficulty: "Beginner" | "Easy" | "Medium" | "Tricky" | "Fiendish";
 }) {
-	const path = "./sudokus/";
+  const [sudokus, setSudokus] = useState<{ filename: string; date: string, hasSolution: boolean }[]>(
+    []
+  );
 
-	const files = await readdir(path);
-	let sudokus: { filename: string; date: string }[] = [];
-	files.map(async (file) => {
-		if (file.startsWith(difficulty)) {
-			sudokus.push({
-				filename: file,
-				date: file.substring(difficulty.length + 1, difficulty.length + 11).replace(/_/g, "/")
-			});
-		}
-	});
-	return (
-		<details>
-			<summary role="button">{difficulty}</summary>
-			<div className="center grid">
-				<Droplist items={sudokus.splice(0, sudokus.length / 3)} />
-				<Droplist items={sudokus.splice(0, sudokus.length / 2)} />
-				<Droplist items={sudokus} />
-			</div>
-		</details>
-	);
+  useEffect(() => {
+    console.log("useEffect");
+
+    getSudokus(difficulty).then((sudokus) => {
+      setSudokus(sudokus);
+    });
+
+    return () => setSudokus((prev) => []);
+  }, []);
+
+  return (
+    <details>
+      <summary role="button">{difficulty}</summary>
+      <div className="center grid">
+        <Droplist items={sudokus} />
+      </div>
+    </details>
+  );
 }

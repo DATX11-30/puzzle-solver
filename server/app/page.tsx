@@ -1,49 +1,45 @@
-"use client"
-
-import { getSolutionFromFile, getAllSudokus } from "@/lib/getSolution";
-import { useEffect, useState } from "react";
+import Dropdown from "@/components/dropdown/dropdown";
+import Sudoku from "@/components/sudoku/sudoku";
+import Link from "next/link";
 
 export default function Home() {
-  const [state, setState] = useState<String | null>(null);
-  const [sudokus, setSudokus] = useState<any>(null);
-
-  useEffect(() => {
-    getSolutionFromFile("../sudokus/Beginner/Beginner_2024_01_01.txt").then((solution) => {
-      if (!solution) {
-        setState("No solution found");
-      }
-      setState(solution);
-    });
-
-    getAllSudokus().then((sudokus) => {
-      if (!sudokus) {
-        setSudokus("No sudokus found");
-      }
-      setSudokus(sudokus);
-    });
-
-    return () => {
-      setState(null);
-      setSudokus(null);
-    };
-  }, []);
-
-  if(!state || !sudokus) return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold">Solution</h1>
-      <p>Loading...</p>
-    </main>
-  );
-      
-  return (
-
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1 className="text-4xl font-bold">Solution</h1>
-      <p>{state}</p>
-      {sudokus.Beginner.map((sudoku: string) => (
-        <p key={sudoku}>{sudoku}</p>
-      ))}
-
-    </main>
-  );
+	return (
+			<article
+				className="container-fluid"
+				style={{
+					height: "100%",
+					display: "flex",
+					flexFlow: "column nowrap",
+					justifyContent: "space-between"
+				}}
+			>
+				<header className="cursor-pointer"><Link href={'/'}>Puzzle Solver</Link></header>
+				<div
+					style={{
+						display: "flex",
+						flexWrap: "nowrap",
+						flexDirection: "row",
+						justifyContent: "center",
+						alignContent: "center",
+						width: "100%"
+					}}
+				>
+					<article className="container-fluid" style={{ marginRight: "1%" }}>
+						<header>Sudoku</header>
+						<Sudoku />
+					</article>
+					<article className="container-fluid" style={{ maxWidth: "30%" }}>
+						<header>Choose a difficulty</header>
+						<div className="overflow-auto">
+							<Dropdown difficulty={"Beginner"} />
+							<Dropdown difficulty={"Easy"} />
+							<Dropdown difficulty={"Medium"} />
+							<Dropdown difficulty={"Tricky"} />
+							<Dropdown difficulty={"Fiendish"} />
+						</div>
+					</article>
+				</div>
+				<footer>Created by Group 30 of DATX11</footer>
+			</article>
+	);
 }
