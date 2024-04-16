@@ -55,10 +55,10 @@ applySolution = foldl placeValueFromStep
 generateSolution :: Sudoku -> Sudoku -> Int -> (Solution,Int)
 generateSolution sud sol  count = case fst next of
                             NOAVAILABLESTEPS -> ([],count)
-                            _ -> if isValid then (if count > 50000 then ([],count) else (fst next : fst res, snd res))else error "invalid solution"
+                            _ -> if isValid then (if count > 100000 then ([],count) else (fst next : fst res, snd res))else error "invalid solution"
     where
         isValid = isValid' u o 
-        next = nextStep sud (steps) 0 --steps -- (optimSteps sud)
+        next = nextStep sud (optimSteps sud) 0 --steps -- (optimSteps sud)
         res = generateSolution (placeValueFromStep sud (fst next)) sol (count + snd next)
         u = concat sud
         o = concat sol

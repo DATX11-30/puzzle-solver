@@ -152,11 +152,6 @@ countChecksForAllInDirToFile dir = do
         print(length files)
         mapM_ countChecksFromFileToFile files
 
-countChecksForAllInDirInDirToFile :: FilePath -> IO()
-countChecksForAllInDirInDirToFile dir = do
-        dirs <- listDirectory dir
-        mapM_ countChecksForAllInDirToFile dirs
-
 countChecksForAllInDir :: FilePath -> IO ()
 countChecksForAllInDir dir = do
         files <- getAllSudokusInDir dir
