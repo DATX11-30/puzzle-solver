@@ -1,3 +1,4 @@
+import React from "react";
 import Block from "./block";
 import "./sudoku.css";
 
@@ -35,11 +36,8 @@ export default function Sudoku({
 	return (
 		<div className="sudoku overflow-auto">
 			{[...Array(9)].map((_, i) => {
-				let highlightIndex = undefined;
-				if (highlight) {
-					highlightIndex =
-						highlight.row === Math.floor(i / 3) && highlight.col === i % 3 ? 4 : undefined;
-				}
+				let highlightIndex =
+					highlight?.row === Math.floor(i / 3) && highlight?.col === i % 3 ? 4 : undefined;
 				return (
 					<Block
 						key={i}

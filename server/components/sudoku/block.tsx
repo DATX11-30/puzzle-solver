@@ -1,3 +1,4 @@
+import React from "react";
 import Cell from "./cell";
 
 export default function Block({
