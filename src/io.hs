@@ -7,6 +7,7 @@ import System.Directory
 import Data.List
 
 
+
 -- A function to simplify the solut
 showSudoku :: Sudoku -> IO ()
 showSudoku sud = putStrLn $ showSud sud
@@ -164,15 +165,16 @@ countChecksFromFile filepath = do
 countChecksFromFileToFile :: FilePath -> IO ()
 countChecksFromFileToFile filepath = do
         sud <- readSudoku filepath
-        appendFile "./result.txt" (filepath ++ "\n")
+        --appendFile "./result.txt" (filepath ++ "\n")
         let result = (generateSolution sud emptySudoku 0)
         let sud' = applySolution sud (fst result)
-        appendFile "./result.txt" (show (snd result) ++ show(isSolved sud') ++"\n")
+        appendFile "./result.txt" (if isSolved sud' then (show(snd result) ++ "\n") else (show(isSolved sud') ++ "\n"))
         print(filepath)
         return ()
 
 countChecksForAllInDirToFile :: FilePath -> IO ()
 countChecksForAllInDirToFile dir = do
+        appendFile "./result.txt" dir
         files <- getAllSudokusInDir dir
         print(length files)
         mapM_ countChecksFromFileToFile files
