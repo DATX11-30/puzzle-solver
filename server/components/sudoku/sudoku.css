@@ -38,6 +38,10 @@
 	margin: none;
 }
 
+.highlight {
+	background-color: lightyellow;
+}
+
 .note {
 	color: gray;
 	font-size: small;
