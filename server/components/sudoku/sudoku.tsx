@@ -19,29 +19,18 @@ export default function Sudoku({
 		);
 	}
 
-	const sudokuValues: (string | string[])[] = [];
+	console.log(sudoku);
 
-	const sudokuArray = sudoku?.split("");
-	for (let i = 0; i < sudokuArray?.length; i++) {
-		if (!isNaN(+sudokuArray[i])) {
-			sudokuValues.push(sudokuArray[i]);
-		} else if (sudokuArray[i] === "[") {
-			sudokuValues.push([sudokuArray[i + 1], sudokuArray[i + 3]]);
-			i += 3;
-		}
+	const blocks: string[] = Array(9).fill("");
+	for (let i = 0; i < sudoku.length; i++) {
+		const block = Math.floor(i / 27) * 3 + Math.floor((i % 9) / 3);
+		blocks[block] = blocks[block].concat(sudoku[i]);
 	}
-
-	console.log(sudokuValues);
 
 	return (
 		<div className="sudoku overflow-auto">
 			{[...Array(9)].map((_, i) => {
-					return (
-					<Block
-						key={i}
-						values={sudokuValues.slice(i * 9, (i + 1) * 9)}
-					/>
-				);
+				return <Block key={i} values={blocks[i].split("")} />;
 			})}
 		</div>
 	);
