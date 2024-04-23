@@ -28,7 +28,7 @@ export default function Home() {
 			>
 				<article className="container-fluid" style={{ marginRight: "1%" }}>
 					<header>Sudoku</header>
-					<Sudoku sudoku="123456789123456789123456789123456789123456789123456789123456789123456789123456789" />
+					<Sudoku />
 				</article>
 				<article className="container-fluid" style={{ maxWidth: "30%" }}>
 					<header>Choose a difficulty</header>
