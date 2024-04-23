@@ -9,10 +9,6 @@ import Data.List
 {----------------------
 Functions for prioritating which positions to check first
 ----------------------}
--- Optim    MFB     LFB     EmptyPos    MFB + Weight v.1 
--- s1       1910    1889    2089            error
--- s2       344     302     501             263 
--- s3       36753   36951   47583           252149
 
 -- | Creating the final list of positions by order of most used number and most filled block
 finalOrderOfPosition :: Sudoku -> [Position]
