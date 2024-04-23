@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
 	const { filename } = useParams();
 	const searchParams = useSearchParams();
 	const [partialSuds, setPartialSuds] = useState<string[] | null>(null);
@@ -123,4 +123,4 @@ const page = (props: Props) => {
 	);
 };
 
-export default page;
+export default Page;
