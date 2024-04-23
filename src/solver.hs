@@ -19,6 +19,7 @@ data Step =     LastFreeCellBlock Position      |
                 HiddenPairRow Position          |
                 HiddenPairColumn Position       |
                 HiddenPairBlock Position        |
+                Origin                          |
                 NOAVAILABLESTEPS
     deriving (Eq,Show) -- | Then add more step types
 

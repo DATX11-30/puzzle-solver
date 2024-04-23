@@ -36,13 +36,10 @@ export default function Sudoku({
 	return (
 		<div className="sudoku overflow-auto">
 			{[...Array(9)].map((_, i) => {
-				let highlightIndex =
-					highlight?.row === Math.floor(i / 3) && highlight?.col === i % 3 ? 4 : undefined;
-				return (
+					return (
 					<Block
 						key={i}
 						values={sudokuValues.slice(i * 9, (i + 1) * 9)}
-						highlight={highlightIndex}
 					/>
 				);
 			})}

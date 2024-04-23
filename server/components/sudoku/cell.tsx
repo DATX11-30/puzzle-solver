@@ -3,16 +3,13 @@ import { log } from "console";
 export default function Cell({
 	notes,
 	value,
-	highlight
 }: {
 	notes?: string[];
 	value?: string;
-	highlight?: boolean;
 }) {
 	if (value && value !== "0") {
-		const classes = highlight ? "cell highlight" : "cell";
 		return (
-			<div className={classes}>
+			<div className={'cell'}>
 				<div className="value" style={{ gridArea: "1 / 1 / span 3 / span 3" }}>
 					{value}
 				</div>

@@ -27,9 +27,10 @@ main = do
           let result = generateSolution sud emptySudoku 0
           let solution = fst result
           let amountChecks = snd result
-          writeFile solFilePath ("Solution:\n" ++ outputArray solution show ++ "\n" ++ show amountChecks ++ "\n")
+          writeFile solFilePath ("Solution:\n" ++ outputArray (Origin : solution) show ++ "\n" ++ show amountChecks ++ "\n")
           print (show solution)
           appendFile solFilePath "PartialSudokus:\n"
+          appendFile solFilePath (deParseSudoku sud ++ "\n")
           applyStepAndWrite sud solution solFilePath
           --writeFile solFilePath (test sud solution amountChecks)
 
