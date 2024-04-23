@@ -5,30 +5,28 @@ import Droplist from "./droplist";
 import { useEffect, useState } from "react";
 
 export default function Dropdown({
-  difficulty,
+	difficulty
 }: {
-  difficulty: "Beginner" | "Easy" | "Medium" | "Tricky" | "Fiendish";
+	difficulty: "Beginner" | "Easy" | "Medium" | "Tricky" | "Fiendish";
 }) {
-  const [sudokus, setSudokus] = useState<{ filename: string; date: string, hasSolution: boolean }[]>(
-    []
-  );
+	const [sudokus, setSudokus] = useState<
+		{ filename: string; date: string; hasSolution: boolean }[]
+	>([]);
 
-  useEffect(() => {
-    console.log("useEffect");
+	useEffect(() => {
+		getSudokus(difficulty).then((sudokus) => {
+			setSudokus(sudokus);
+		});
 
-    getSudokus(difficulty).then((sudokus) => {
-      setSudokus(sudokus);
-    });
+		return () => setSudokus((prev) => []);
+	}, []);
 
-    return () => setSudokus((prev) => []);
-  }, []);
-
-  return (
-    <details>
-      <summary role="button">{difficulty}</summary>
-      <div className="center grid">
-        <Droplist items={sudokus} />
-      </div>
-    </details>
-  );
+	return (
+		<details>
+			<summary role="button">{difficulty}</summary>
+			<div className="center grid">
+				<Droplist items={sudokus} />
+			</div>
+		</details>
+	);
 }
