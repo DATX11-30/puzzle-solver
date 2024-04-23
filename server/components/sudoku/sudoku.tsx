@@ -2,13 +2,7 @@ import React from "react";
 import Block from "./block";
 import "./sudoku.css";
 
-export default function Sudoku({
-	sudoku,
-	highlight
-}: {
-	sudoku?: string;
-	highlight?: { row: number; col: number };
-}) {
+export default function Sudoku({ sudoku }: { sudoku?: string }) {
 	if (!sudoku) {
 		return (
 			<div className="sudoku overflow-auto">
@@ -18,8 +12,6 @@ export default function Sudoku({
 			</div>
 		);
 	}
-
-	console.log(sudoku);
 
 	const blocks: string[] = Array(9).fill("");
 	for (let i = 0; i < sudoku.length; i++) {
