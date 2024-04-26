@@ -1,0 +1,134 @@
+"use client";
+
+import Dropdown from "@/components/dropdown/dropdown";
+import Sudoku from "@/components/sudoku/sudoku";
+import { getSolution } from "@/lib/getSolution";
+import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+
+type Props = {};
+
+const Page = (props: Props) => {
+	const { filename } = useParams();
+	const searchParams = useSearchParams();
+	const [partialSuds, setPartialSuds] = useState<string[] | null>(null);
+	const [techniques, setTechniques] = useState<string[] | null>(null);
+
+	const [currentIndex, setCurrentIndex] = useState<number>(
+		searchParams.has("step") ? parseInt(searchParams.get("step") as string) - 1 : 0
+	);
+
+	const handleKeyDown = (event: KeyboardEvent) => {
+		if (!partialSuds) return;
+
+		if (event.key == "ArrowRight") {
+			setCurrentIndex((prev) => {
+				if (prev + 1 < partialSuds.length) {
+					return prev + 1;
+				} else {
+					return prev;
+				}
+			});
+		} else if (event.key == "ArrowLeft") {
+			setCurrentIndex((prev) => {
+				if (prev - 1 >= 0) {
+					return prev - 1;
+				} else {
+					return prev;
+				}
+			});
+		}
+	};
+
+	useEffect(() => {
+		getSolution(filename as string).then((solution) => {
+			setPartialSuds(solution.partialSuds);
+			setTechniques(solution.techniques);
+		});
+	}, []);
+
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [partialSuds]);
+
+	useEffect(() => {
+		if (!techniques) return;
+		if (techniques[currentIndex].includes("Origin")) return;
+
+		const technique = techniques[currentIndex];
+		const y = parseInt(technique.charAt(technique.indexOf("(") + 1));
+		const x = parseInt(technique.charAt(technique.indexOf(",") + 1));
+
+		const i = y * 9 + x;
+		const block = Math.floor(i / 27) * 3 + Math.floor((i % 9) / 3);
+		const cell = (i % 3) + (y % 3) * 3;
+
+		document.querySelectorAll(".cell")[block * 9 + cell].classList.add("highlight");
+
+		return () => {
+			document.querySelectorAll(".cell").forEach((cell) => {
+				cell.classList.remove("highlight");
+			});
+		};
+	}, [currentIndex, techniques]);
+
+	if (!partialSuds || !techniques) {
+		return <div>Loading...</div>;
+	}
+
+	return (
+		<article
+			className="container-fluid"
+			style={{
+				height: "100%",
+				display: "flex",
+				flexFlow: "column nowrap",
+				justifyContent: "space-between"
+			}}
+		>
+			<header className="cursor-pointer">
+				<Link href={"/"}>Puzzle Solver</Link>
+			</header>
+			<div
+				style={{
+					display: "flex",
+					flexWrap: "nowrap",
+					flexDirection: "row",
+					justifyContent: "center",
+					alignContent: "center",
+					width: "100%"
+				}}
+			>
+				<article className="container-fluid" style={{ marginRight: "1%" }}>
+					<header>
+						<p>
+							{currentIndex + 1} / {partialSuds.length} {" " + filename}
+						</p>
+						<p>
+							{techniques[currentIndex].split("").splice(0, techniques[currentIndex].length - 1)}
+						</p>
+					</header>
+					<Sudoku sudoku={partialSuds[currentIndex]} />
+				</article>
+				<article className="container-fluid" style={{ maxWidth: "30%" }}>
+					<header>Choose a difficulty</header>
+					<div className="overflow-auto">
+						<Dropdown difficulty={"Beginner"} />
+						<Dropdown difficulty={"Easy"} />
+						<Dropdown difficulty={"Medium"} />
+						<Dropdown difficulty={"Tricky"} />
+						<Dropdown difficulty={"Fiendish"} />
+					</div>
+				</article>
+			</div>
+			<footer>Created by Group 30 of DATX11</footer>
+		</article>
+	);
+};
+
+export default Page;
