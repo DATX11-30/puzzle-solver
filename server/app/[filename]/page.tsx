@@ -57,7 +57,7 @@ const Page = (props: Props) => {
 	}, [partialSuds]);
 
 	useEffect(() => {
-		if (!techniques) return;
+		if (!techniques || techniques.length == 0) return;
 		if (techniques[currentIndex].includes("Origin")) return;
 
 		const technique = techniques[currentIndex];
@@ -77,7 +77,7 @@ const Page = (props: Props) => {
 		};
 	}, [currentIndex, techniques]);
 
-	if (!partialSuds || !techniques) {
+	if (!partialSuds || !techniques || techniques.length == 0) {
 		return <div>Loading...</div>;
 	}
 

@@ -1,7 +1,7 @@
 import React from "react";
 import Cell from "./cell";
 
-export default function Block({ values }: { values?: string[] }) {
+export default function Block({ values }: { values?: Array<string | string[]> }) {
 	let value: string[] = new Array(9).fill("0");
 
 	if (!values) {
